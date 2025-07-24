@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ news.title }} - Wellington Despachante RJ{% endblock %}
+{% block meta_description %}{{ news.meta_description|default(news.content|striptags|truncate(160)) }}{% endblock %}
+
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ news.social_title or news.title }}{% endblock %}
+{% block og_description %}{{ news.social_description or news.meta_description|default(news.content|striptags|truncate(160)) }}{% endblock %}
+{% block og_image %}{{ url_for('static', filename='uploads/images/medium/' + news.featured_image, _external=True) if news.featured_image else url_for('static', filename='images/logo_og.jpg', _external=True) }}{% endblock %}
+
+{% block body_class %}bg-white{% endblock %}
+
+{% block content %}
+<div class="py-8 lg:py-12">
+    <div class="container mx-auto max-w-4xl px-6">
+        <article>
+            <!-- Article Header -->
+            <header class="mb-8">
+                <!-- Breadcrumbs -->
+                <nav class="text-sm mb-4 text-gray-500">
+                    <a href="{{ url_for('index') }}" class="hover:text-orange-500">Início</a>
+                    <span class="mx-2">/</span>
+                    <a href="{{ url_for('blog') }}" class="hover:text-orange-500">Blog</a>
+                    {% if news.category_rel %}
+                    <span class="mx-2">/</span>
+                    <a href="{{ url_for('blog', category_slug=news.category_rel.slug) }}" class="hover:text-orange-500">{{ news.category_rel.name }}</a>
+                    {% endif %}
+                </nav>
+
+                <h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">{{ news.title }}</h1>
+                
+                {% if news.subtitle %}
+                <p class="text-lg md:text-xl text-gray-600 mt-2">{{ news.subtitle }}</p>
+                {% endif %}
+                
+                <!-- Meta Info -->
+                <div class="mt-6 flex items-center gap-6 text-sm text-gray-500">
+                    <div class="flex items-center gap-2">
+                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        <span>Por <strong>{{ news.author_user.name if news.author_user else 'Equipe' }}</strong></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span>{{ news.publication_date.strftime('%d de %B, %Y') }}</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Featured Media -->
+            <div class="my-8 rounded-lg overflow-hidden shadow-lg">
+                {% if news.video_embed_url %}
+                    <div class="aspect-w-16 aspect-h-9">
+                        <iframe src="{{ news.video_embed_url }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                {% elif news.featured_image %}
+                    <img src="{{ url_for('static', filename='uploads/images/medium/' + news.featured_image) }}" 
+                         alt="{{ news.title }}" 
+                         class="w-full h-full object-cover">
+                {% endif %}
+            </div>
+
+            <!-- Article Body -->
+            <div class="prose lg:prose-xl max-w-none">
+                {{ news.content|safe }}
+            </div>
+
+            <!-- Tags & Share -->
+            <footer class="mt-12 pt-8 border-t border-gray-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                    {% if news.tags_rel %}
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h3 class="text-lg font-semibold text-gray-800 mr-2">Tags:</h3>
+                        {% for tag in news.tags_rel %}
+                        <a href="{{ url_for('blog', tag_slug=tag.slug) }}" class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-orange-500 hover:text-white transition-colors">
+                            {{ tag.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-lg font-semibold text-gray-800">Compartilhe:</h3>
+                        <div class="flex gap-2">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url|urlencode }}" target="_blank" rel="noopener" class="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full text-gray-600 hover:bg-blue-600 hover:text-white transition-colors"><i class="ri-facebook-fill"></i></a>
+                            <a href="https://twitter.com/intent/tweet?url={{ request.url|urlencode }}&text={{ news.title|urlencode }}" target="_blank" rel="noopener" class="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full text-gray-600 hover:bg-sky-500 hover:text-white transition-colors"><i class="ri-twitter-fill"></i></a>
+                            <a href="https://api.whatsapp.com/send?text={{ (news.title + ' ' + request.url)|urlencode }}" target="_blank" rel="noopener" class="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full text-gray-600 hover:bg-green-500 hover:text-white transition-colors"><i class="ri-whatsapp-line"></i></a>
+                            <button onclick="copyToClipboard('{{ request.url }}')" class="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full text-gray-600 hover:bg-gray-800 hover:text-white transition-colors copy-btn" title="Copiar Link">
+                                <i class="ri-link"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </article>
+    </div>
+</div>
+
+<!-- Related Articles -->
+{% if related_news %}
+<section class="bg-gray-50 py-16">
+    <div class="container mx-auto max-w-7xl px-6">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Artigos Relacionados</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for related in related_news %}
+            <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-transform duration-300 flex flex-col">
+                <a href="{{ url_for('news_detail', slug=related.slug) }}">
+                    <img src="{{ url_for('static', filename='uploads/images/medium/' + related.featured_image) if related.featured_image else url_for('static', filename='images/placeholder_news.jpg') }}" alt="{{ related.title }}" class="w-full h-56 object-cover">
+                </a>
+                <div class="p-6 flex-grow flex flex-col">
+                    {% if related.category_rel %}
+                    <p class="text-sm font-semibold text-orange-500 uppercase">{{ related.category_rel.name }}</p>
+                    {% endif %}
+                    <h3 class="mt-2 text-xl font-bold text-gray-800 flex-grow">
+                        <a href="{{ url_for('news_detail', slug=related.slug) }}" class="hover:text-gray-600">{{ related.title }}</a>
+                    </h3>
+                    <p class="mt-4 text-sm text-gray-500">{{ related.publication_date.strftime('%d/%m/%Y') }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Comments Section -->
+{% if news.allow_comments %}
+<section class="py-16">
+    <div class="container mx-auto max-w-4xl px-6">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8">Comentários</h2>
+        
+        <!-- Comment Form -->
+        <div class="bg-gray-50 p-8 rounded-lg mb-12">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Deixe seu comentário</h3>
+            <form action="{{ url_for('add_comment', news_id=news.id) }}" method="POST" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nome <span class="text-red-500">*</span></label>
+                        <input type="text" id="name" name="name" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" name="email" required placeholder="Seu email não será publicado" class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500">
+                    </div>
+                </div>
+                <div>
+                    <label for="content" class="block text-sm font-medium text-gray-700">Comentário <span class="text-red-500">*</span></label>
+                    <textarea id="content" name="content" rows="5" required class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"></textarea>
+                </div>
+                <button type="submit" class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-orange-500 hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                    Enviar Comentário
+                </button>
+            </form>
+        </div>
+
+        <!-- Comments List -->
+        <div class="space-y-8">
+            {% set approved_comments = news.comments|selectattr('approved')|list %}
+            {% if approved_comments %}
+                {% for comment in approved_comments %}
+                <div class="flex items-start gap-4" id="comment-{{ comment.id }}">
+                    <div class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    </div>
+                    <div class="flex-grow bg-gray-50 p-4 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="font-semibold text-gray-800">{{ comment.author }}</p>
+                            <p class="text-xs text-gray-500">{{ comment.publication_date.strftime('%d/%m/%Y, %H:%M') }}</p>
+                        </div>
+                        <p class="text-gray-700">{{ comment.content|nl2br }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-center text-gray-500">Seja o primeiro a comentar!</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block custom_js %}
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        const copyBtn = document.querySelector('.copy-btn');
+        const originalIcon = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="ri-check-line"></i>';
+        copyBtn.title = 'Copiado!';
+        setTimeout(() => {
+            copyBtn.innerHTML = originalIcon;
+            copyBtn.title = 'Copiar Link';
+        }, 2000);
+    }).catch(() => {
+        alert('Erro ao copiar o link.');
+    });
+}
+</script>
+{% endblock %} 

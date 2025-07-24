@@ -1,0 +1,467 @@
+{% extends "base.html" %}
+
+{% block title %}Wellington Despachante - Soluções completas em serviços de Detran{% endblock %}
+
+{% block meta_description %}Wellington Despachante oferece soluções completas para documentação veicular no Rio de Janeiro. Conte com a experiência de Wellington Curvelo para resolver todas as suas necessidades junto ao Detran.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-blue-800 text-white">
+    <div class="container mx-auto max-w-7xl px-6 pt-20 pb-16 text-center">
+        <h1 class="text-4xl md:text-6xl font-extrabold leading-tight mb-4">
+            Soluções Completas em<br>
+            Serviços de <span class="text-orange-400">Detran</span>
+        </h1>
+        <p class="text-lg md:text-xl text-blue-100 mb-10 max-w-3xl mx-auto">
+            Conte com a experiência de Wellington Curvelo para resolver todas as suas necessidades de documentação veicular com agilidade e segurança.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <a href="#servicos" class="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg shadow-lg">
+                Nossos Serviços
+            </a>
+            <a href="#contato" class="w-full sm:w-auto bg-transparent border-2 border-white hover:bg-white hover:text-blue-800 text-white font-bold py-3 px-8 rounded-lg transition duration-300 text-lg">
+                Entre em Contato
+            </a>
+        </div>
+    </div>
+    <div class="container mx-auto max-w-7xl px-6 pb-20">
+        <div class="flex justify-center items-center gap-8 md:gap-16">
+            <div class="text-center">
+                <span class="text-4xl md:text-5xl font-bold text-orange-400">+5.000</span>
+                <span class="block mt-2 text-lg text-blue-200">Clientes Atendidos</span>
+            </div>
+            <div class="text-center">
+                <span class="text-4xl md:text-5xl font-bold text-orange-400">18 anos</span>
+                <span class="block mt-2 text-lg text-blue-200">De Experiência</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Serviços Section -->
+<section id="servicos" class="bg-gray-50 py-20">
+    <div class="container mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Nossos Serviços</h2>
+            <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">Oferecemos uma ampla gama de serviços para atender todas as suas necessidades relacionadas ao Detran.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% if services %}
+                {% for service in services %}
+                <div class="bg-white rounded-lg p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100">
+                    <div class="inline-block bg-blue-100 text-blue-600 rounded-full p-4 mb-6">
+                        {# Usa o ícone definido no admin, com um fallback caso esteja vazio #}
+                        <i class="{{ service.icon | default('ri-article-line') }} text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3">{{ service.name }}</h3>
+                    {# Limita o resumo a um número de caracteres se necessário, mas o ideal é controlar no admin #}
+                    <p class="text-gray-600 mb-6 h-24">{{ service.summary }}</p> 
+                    <a href="{{ url_for('service_detail', slug=service.slug) }}" class="font-semibold text-blue-600 hover:text-orange-500 transition-colors">
+                        Saiba mais
+                    </a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-center col-span-3 text-gray-500">Nenhum serviço disponível no momento. Cadastre novos serviços no painel de administração.</p>
+            {% endif %}
+        </div>
+        
+        <div class="text-center mt-16">
+            <a href="{{ url_for('services_list') }}" class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-3 px-8 rounded-lg transition duration-300 shadow-lg">Ver todos os serviços</a>
+        </div>
+    </div>
+</section>
+
+<!-- Lista Completa de Serviços -->
+<section id="lista-servicos" class="bg-white py-20">
+    <div class="container mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Lista Completa de Serviços</h2>
+            <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">Confira todos os serviços que oferecemos para facilitar sua vida junto ao Detran.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-4 max-w-5xl mx-auto">
+            {% for service in all_services %}
+            <div class="flex items-center">
+                <i class="ri-check-line text-blue-600 mr-3 text-xl"></i>
+                <span class="text-gray-700">{{ service.name }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-12">
+            <a href="#contato" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg transition duration-300 shadow-lg">Solicitar Orçamento</a>
+        </div>
+    </div>
+</section>
+
+<!-- Sobre Section -->
+<section id="sobre" class="bg-gray-50 py-20">
+    <div class="container mx-auto max-w-7xl px-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <div>
+                 <img src="{{ url_for('static', filename='images/wellington-curvelo.jpg') }}" alt="Wellington Curvelo" class="rounded-lg shadow-2xl w-full h-auto object-cover" onerror="this.src='{{ url_for('static', filename='images/placeholder_profile.jpg') }}'">
+            </div>
+            <div>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Sobre Wellington Curvelo</h2>
+                <div class="w-24 h-1 bg-orange-500 mb-6"></div>
+                <p class="text-gray-600 mb-4 text-lg">Com mais de 18 anos de experiência no setor de documentação veicular, Wellington Curvelo oferece uma variedade de serviços para veículos novos, usados e seminovos.</p>
+                <p class="text-gray-600 mb-8 text-lg">Nossa estrutura é exclusiva para atender, reduzindo os prazos e garantindo a eficiência em todos os processos, como despachante credenciado pelo Detran-RJ. Atendemos clientes do Rio de Janeiro e diversas localidades do estado.</p>
+                
+                <div class="grid grid-cols-2 gap-6 mb-8">
+                    <div class="flex items-center gap-3">
+                        <i class="ri-shield-check-line text-blue-600 text-2xl"></i>
+                        <span class="text-gray-700 font-semibold">Credenciado pelo Detran</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                         <i class="ri-customer-service-2-line text-blue-600 text-2xl"></i>
+                        <span class="text-gray-700 font-semibold">Suporte personalizado</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="ri-rocket-line text-blue-600 text-2xl"></i>
+                        <span class="text-gray-700 font-semibold">Atendimento ágil</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="ri-graduation-cap-line text-blue-600 text-2xl"></i>
+                        <span class="text-gray-700 font-semibold">Formação especializada</span>
+                    </div>
+                </div>
+                <a href="#contato" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg transition duration-300 shadow-lg">Fale com Wellington</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- O que nossos clientes dizem -->
+<section id="depoimentos" class="bg-white py-20">
+    <div class="container mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">O que nossos clientes dizem</h2>
+            <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">A satisfação dos nossos clientes é a nossa maior recompensa.</p>
+        </div>
+        <div class="relative max-w-4xl mx-auto">
+            <div id="testimonial-slider-2" class="flex overflow-hidden w-full">
+                {% if testimonials %}
+                    {% for testimonial in testimonials %}
+                    <div class="testimonial-slide-2 flex-shrink-0 w-full p-4">
+                        <div class="bg-gray-50 rounded-lg p-8 text-center border border-gray-200">
+                            <div class="text-yellow-400 mb-4 text-2xl">
+                                {% for i in range(testimonial.rating|int) %}
+                                    <i class="ri-star-s-fill"></i>
+                                {% endfor %}
+                                {% for i in range(5 - (testimonial.rating|int)) %}
+                                    <i class="ri-star-s-line"></i>
+                                {% endfor %}
+                            </div>
+                            <p class="text-gray-600 italic text-lg mb-6">"{{ testimonial.content }}"</p>
+                            <div class="flex items-center justify-center">
+                                <i class="ri-user-fill text-gray-400 text-2xl mr-3"></i>
+                                <div>
+                                    <p class="font-bold text-gray-800 text-xl">{{ testimonial.name }}</p>
+                                    {% if testimonial.location %}<p class="text-gray-500">{{ testimonial.location }}</p>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center w-full text-gray-500">Nenhum depoimento disponível no momento.</p>
+                {% endif %}
+            </div>
+            {% if testimonials and testimonials|length > 1 %}
+            <button id="prev-testimonial" class="absolute top-1/2 left-0 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 -ml-4"><i class="ri-arrow-left-s-line text-2xl"></i></button>
+            <button id="next-testimonial" class="absolute top-1/2 right-0 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-md hover:bg-gray-100 -mr-4"><i class="ri-arrow-right-s-line text-2xl"></i></button>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+
+<!-- Why Choose Us Section -->
+<section class="bg-gray-50 py-20">
+    <div class="container mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Por que escolher a WDespachante?</h2>
+            <p class="text-lg text-gray-600 mt-4 max-w-3xl mx-auto">Oferecemos soluções completas para facilitar sua vida, economizar seu tempo e garantir tranquilidade nos processos junto ao Detran.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Facilidade -->
+            <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                <i class="ri-bubble-chart-line text-4xl text-blue-600 mb-4 inline-block"></i>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Facilidade</h3>
+                <p class="text-gray-600">Simplificamos os processos burocráticos, cuidando de toda a documentação para você.</p>
+            </div>
+            <!-- Tranquilidade -->
+             <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                <i class="ri-shield-heart-line text-4xl text-blue-600 mb-4 inline-block"></i>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Tranquilidade</h3>
+                <p class="text-gray-600">Acompanhamento total do seu processo, mantendo você informado em cada etapa.</p>
+            </div>
+            <!-- Segurança -->
+            <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                <i class="ri-lock-2-line text-4xl text-blue-600 mb-4 inline-block"></i>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Segurança</h3>
+                <p class="text-gray-600">Processos realizados com total conformidade legal, garantindo sua proteção.</p>
+            </div>
+             <!-- Economia de Tempo -->
+            <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                <i class="ri-time-line text-4xl text-blue-600 mb-4 inline-block"></i>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Economia de Tempo</h3>
+                <p class="text-gray-600">Evite filas e burocracia. Nós cuidamos de tudo para que você possa focar no que importa.</p>
+            </div>
+            <!-- Atendimento Personalizado -->
+            <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                <i class="ri-user-heart-line text-4xl text-blue-600 mb-4 inline-block"></i>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Atendimento Personalizado</h3>
+                <p class="text-gray-600">Atenção individualizada com orientação completa sobre seu processo específico.</p>
+            </div>
+            <!-- Agilidade -->
+            <div class="bg-white p-6 rounded-lg shadow-sm text-center">
+                <i class="ri-flashlight-line text-4xl text-blue-600 mb-4 inline-block"></i>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Agilidade nos Processos</h3>
+                <p class="text-gray-600">Nossa experiência permite que seus processos sejam concluídos no menor tempo possível.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Section -->
+<section id="blog" class="bg-white py-20">
+    <div class="container mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Últimas Notícias do Blog</h2>
+            <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">Mantenha-se atualizado com as últimas novidades, dicas e informações do mundo automotivo.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for news_article in latest_news %}
+            <div class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col border border-gray-100">
+                <a href="{{ url_for('news_detail', slug=news_article.slug) }}" class="block">
+                    <img src="{% if news_article.featured_image %}{{ url_for('static', filename='uploads/images/medium/' + news_article.featured_image) }}{% else %}{{ url_for('static', filename='images/placeholder_news.jpg') }}{% endif %}" alt="{{ news_article.title }}" class="w-full h-56 object-cover">
+                </a>
+                <div class="p-6 flex-grow flex flex-col">
+                    <div class="mb-4">
+                        <span class="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full uppercase">{{ news_article.category_rel.name if news_article.category_rel else 'Geral' }}</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-3 flex-grow">
+                        <a href="{{ url_for('news_detail', slug=news_article.slug) }}" class="hover:text-blue-700 transition-colors">{{ news_article.title }}</a>
+                    </h3>
+                    <div class="mt-auto pt-4">
+                        <a href="{{ url_for('news_detail', slug=news_article.slug) }}" class="font-semibold text-blue-600 hover:text-orange-500 transition-colors">
+                            Leia mais <i class="ri-arrow-right-s-line align-middle"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+         <div class="text-center mt-16">
+            <a href="{{ url_for('blog') }}" class="bg-blue-800 hover:bg-blue-900 text-white font-bold py-3 px-8 rounded-lg transition duration-300">Ver todas as notícias</a>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq" class="bg-gray-50 py-20">
+    <div class="container mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Perguntas Frequentes</h2>
+            <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">Tire suas dúvidas sobre nossos serviços e processos junto ao Detran.</p>
+        </div>
+        <div class="max-w-4xl mx-auto space-y-4" id="faq-accordion">
+            {% if faqs %}
+                {% for qa in faqs %}
+                <div class="border border-gray-200 rounded-lg">
+                    <button class="faq-question w-full flex justify-between items-center p-6 text-left">
+                        <span class="text-lg font-semibold text-gray-800">{{ qa.question }}</span>
+                        <svg class="w-6 h-6 text-gray-500 transition-transform transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="faq-answer overflow-hidden max-h-0 transition-all duration-500 ease-in-out">
+                        <div class="p-6 pt-0 text-gray-600">{{ qa.answer|safe }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                 <p class="text-center text-gray-500">Nenhuma pergunta frequente disponível no momento.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section id="cta" class="bg-blue-800 text-white">
+    <div class="container mx-auto max-w-7xl px-6 py-16 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Pronto para resolver suas pendências com o Detran?</h2>
+        <p class="text-lg text-blue-200 max-w-3xl mx-auto mb-8">Entre em contato agora mesmo e descubra como podemos facilitar sua vida com nossos serviços especializados.</p>
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <a href="#contato" class="w-full sm:w-auto bg-white text-blue-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-200 transition-colors">Solicitar Orçamento</a>
+            <a href="https://wa.me/5521964474147" target="_blank" class="w-full sm:w-auto border-2 border-white text-white font-bold py-3 px-8 rounded-lg hover:bg-white hover:text-blue-800 transition-colors">Falar no WhatsApp</a>
+        </div>
+    </div>
+</section>
+
+<!-- Links Úteis -->
+<section id="links-uteis" class="bg-white py-20">
+    <div class="container mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Links Úteis</h2>
+            <p class="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">Acesse os principais portais de serviços relacionados ao trânsito, veículos e habilitação.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for link in useful_links %}
+            <a href="{{ link.url }}" target="_blank" class="block bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                <h4 class="font-bold text-blue-800 text-lg mb-2">{{ link.title }}</h4>
+                <p class="text-gray-600">{{ link.description }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Detrans do Brasil -->
+<section id="detrans-brasil" class="bg-gray-50 py-20">
+    <div class="container mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Detrans do Brasil</h2>
+            <p class="text-lg text-gray-600 mt-4 max-w-3xl mx-auto">Acesse diretamente os sites oficiais de todos os Detrans do Brasil para consultas de veículos, habilitação e outros serviços.</p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {% for detran in detrans %}
+            <a href="{{ detran.url }}" target="_blank" class="bg-white p-4 rounded-lg shadow-sm hover:shadow-lg transition-shadow text-center">
+                {% if detran.flag_image %}
+                <img src="{{ url_for('static', filename='images/flags/' + detran.flag_image) }}" alt="Bandeira de {{ detran.state }}" class="w-10 h-auto mx-auto mb-2">
+                {% endif %}
+                <span class="font-semibold text-gray-700 text-sm">{{ detran.state }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+<!-- Contact Section -->
+<section id="contato" class="bg-gray-50 py-20">
+    <div class="container mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800">Entre em Contato</h2>
+            <p class="text-lg text-gray-600 mt-4 max-w-3xl mx-auto">Estamos prontos para te ajudar. Preencha o formulário ou use um dos nossos canais de atendimento.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Informações de Contato</h3>
+                <div class="space-y-5 text-gray-700">
+                    <p class="flex items-start gap-4"><i class="ri-map-pin-2-line text-2xl text-orange-500 mt-1"></i> <span>Av. Treze de Maio, 23 - Sala 1936<br>Centro, Rio de Janeiro - RJ</span></p>
+                    <p class="flex items-center gap-4"><i class="ri-phone-line text-2xl text-orange-500"></i> <span>(21) 2220-2679</span></p>
+                    <p class="flex items-center gap-4"><i class="ri-mail-line text-2xl text-orange-500"></i> <a href="mailto:atendimento@wdespachante.com.br" class="hover:text-orange-500">atendimento@wdespachante.com.br</a></p>
+                    <a href="https://wa.me/5521964474147" target="_blank" class="inline-flex items-center gap-3 bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 transition-colors w-full justify-center text-lg mt-4">
+                        <i class="ri-whatsapp-line text-2xl"></i>
+                        Falar no WhatsApp
+                    </a>
+                </div>
+            </div>
+            <div class="bg-white p-8 rounded-lg shadow-md">
+                 <form method="POST" action="{{ url_for('handle_contact') }}" class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                        <input type="text" id="name" name="name" required class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    </div>
+                     <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                        <input type="email" id="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    </div>
+                     <div>
+                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+                        <input type="tel" id="phone" name="phone" required class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    </div>
+                     <div>
+                        <label for="service_interest" class="block text-sm font-medium text-gray-700 mb-1">Serviço de Interesse</label>
+                        <select id="service_interest" name="service_interest" class="w-full px-4 py-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                            <option value="">Selecione um serviço</option>
+                            {% for service in all_services %}
+                            <option value="{{ service.name }}">{{ service.name }}</option>
+                            {% endfor %}
+                            <option value="Outro Serviço">Outro Serviço</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Mensagem</label>
+                        <textarea id="message" name="message" rows="5" required class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors text-lg shadow-lg">Enviar Mensagem</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+
+{% block custom_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Logic for the new testimonial slider
+    const slider2 = document.getElementById('testimonial-slider-2');
+    if (slider2) {
+        const slides2 = slider2.querySelectorAll('.testimonial-slide-2');
+        const prevBtn = document.getElementById('prev-testimonial');
+        const nextBtn = document.getElementById('next-testimonial');
+        
+        if (slides2.length > 1) {
+            let currentSlide2 = 0;
+
+            function goToSlide2(index) {
+                if (index < 0) index = slides2.length - 1;
+                if (index >= slides2.length) index = 0;
+                
+                slider2.style.transform = `translateX(-${index * 100}%)`;
+                currentSlide2 = index;
+            }
+
+            prevBtn.addEventListener('click', () => goToSlide2(currentSlide2 - 1));
+            nextBtn.addEventListener('click', () => goToSlide2(currentSlide2 + 1));
+
+            setInterval(() => {
+                goToSlide2(currentSlide2 + 1);
+            }, 7000); // Auto-play every 7 seconds
+        } else if (prevBtn && nextBtn) {
+            // Hide buttons if there's only one slide
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+        }
+    }
+
+    // Existing logic for the old testimonial slider to prevent errors
+    const slider1 = document.getElementById('testimonial-slider');
+    const dotsContainer1 = document.getElementById('testimonial-dots');
+    if (slider1 && dotsContainer1) {
+        // This can be left empty or with minimal logic if the slider is no longer displayed
+    }
+
+    // FAQ Accordion
+    const accordion = document.getElementById('faq-accordion');
+    if (accordion) {
+        const items = accordion.querySelectorAll('.faq-question');
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                const answer = item.nextElementSibling;
+                const icon = item.querySelector('svg');
+
+                if (answer.style.maxHeight) {
+                    answer.style.maxHeight = null;
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    // Close other open items
+                    accordion.querySelectorAll('.faq-answer').forEach(ans => {
+                        if (ans.style.maxHeight) {
+                           ans.style.maxHeight = null;
+                           ans.previousElementSibling.querySelector('svg').style.transform = 'rotate(0deg)';
+                        }
+                    });
+                    answer.style.maxHeight = answer.scrollHeight + 'px';
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+    }
+});
+</script>
+{% endblock custom_js %}
+

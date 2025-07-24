@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{{ service.name }} - WDespachante{% endblock %}
+
+{% block content %}
+<div class="bg-white py-12">
+    <div class="container mx-auto max-w-5xl px-6">
+        
+        <!-- Breadcrumbs -->
+        <nav class="text-sm mb-8" aria-label="Breadcrumb">
+            <ol class="list-none p-0 inline-flex">
+                <li class="flex items-center">
+                    <a href="{{ url_for('home_new') }}" class="text-gray-500 hover:text-blue-600">Início</a>
+                    <i class="ri-arrow-right-s-line mx-2"></i>
+                </li>
+                <li class="flex items-center">
+                    <a href="{{ url_for('services_list') }}" class="text-gray-500 hover:text-blue-600">Serviços</a>
+                    <i class="ri-arrow-right-s-line mx-2"></i>
+                </li>
+                <li class="flex items-center">
+                    <span class="text-gray-800 font-semibold">{{ service.name }}</span>
+                </li>
+            </ol>
+        </nav>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <!-- Coluna Principal com Conteúdo -->
+            <div class="md:col-span-2">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ service.name }}</h1>
+                <div class="prose max-w-none text-gray-700 leading-relaxed">
+                    {{ service.content|safe }}
+                </div>
+            </div>
+            
+            <!-- Barra Lateral -->
+            <aside>
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Outros Serviços</h3>
+                    <ul>
+                        {% for other_service in related_services %}
+                        <li class="mb-3">
+                            <a href="{{ url_for('service_detail', slug=other_service.slug) }}" class="flex items-center text-gray-700 hover:text-blue-600">
+                                <i class="ri-arrow-right-s-fill mr-2 text-blue-600"></i>
+                                <span>{{ other_service.name }}</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{{ url_for('services_list') }}" class="mt-6 block w-full text-center bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                        Ver Todos os Serviços
+                    </a>
+                </div>
+                
+                <div class="bg-orange-500 text-white p-6 rounded-lg shadow-lg mt-8 text-center">
+                    <h3 class="text-xl font-bold mb-2">Precisa de Ajuda?</h3>
+                    <p class="mb-4">Entre em contato para um orçamento sem compromisso.</p>
+                    <a href="#contato" class="bg-white text-orange-600 font-bold py-2 px-6 rounded-lg hover:bg-gray-200 transition-colors">
+                        Fale Conosco
+                    </a>
+                </div>
+            </aside>
+        </div>
+
+    </div>
+</div>
+{% endblock %} 

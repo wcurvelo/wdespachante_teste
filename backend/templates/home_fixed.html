@@ -1,0 +1,506 @@
+{% extends "base.html" %}
+
+{% block title %}Wellington Despachante - Soluções completas em serviços de Detran{% endblock %}
+
+{% block meta_description %}Wellington Despachante oferece soluções completas para documentação veicular no Rio de Janeiro. Conte com a experiência de Wellington Curvelo para resolver todas as suas necessidades junto ao Detran.{% endblock %}
+
+{% block content %}
+<!-- Hero Section com imagem de fundo mais impactante -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Soluções completas em<br>serviços de <span class="highlight">Detran</span></h1>
+        <p>Conte com a experiência de Wellington Curvelo para resolver todas as suas necessidades de documentação veicular com agilidade e segurança.</p>
+        <div class="hero-buttons">
+            <a href="#servicos" class="btn btn-primary">Nossos Serviços</a>
+            <a href="#contato" class="btn btn-secondary">Entre em Contato</a>
+        </div>
+    </div>
+    <div class="hero-stats">
+        <div class="stat-item">
+            <span class="stat-number">+5.000</span>
+            <span class="stat-label">Clientes atendidos</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">18 anos</span>
+            <span class="stat-label">De experiência</span>
+        </div>
+    </div>
+</section>
+
+<!-- Serviços Section com cards mais modernos -->
+<section id="servicos" class="services">
+    <div class="container">
+        <h2 class="section-title">Nossos Serviços</h2>
+        <p class="section-description">Oferecemos uma ampla gama de serviços para atender todas as suas necessidades relacionadas ao Detran.</p>
+        
+        <div class="services-grid">
+            {% for service in featured_services %}
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-{{ service.icon or 'car' }}"></i>
+                </div>
+                <h3 class="service-title">{{ service.name }}</h3>
+                <p class="service-description">{{ service.short_description }}</p>
+                <a href="{{ url_for('service_detail', slug=service.slug) }}" class="btn btn-outline">Saiba mais</a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="services-action">
+            <a href="{{ url_for('services_list') }}" class="btn btn-primary">Ver todos os serviços</a>
+        </div>
+    </div>
+</section>
+
+<!-- Lista Completa de Serviços com melhor organização -->
+<section class="services-list">
+    <div class="container">
+        <h2 class="section-title">Lista Completa de Serviços</h2>
+        <p class="section-description">Confira abaixo todos os serviços que oferecemos para facilitar sua vida junto ao Detran.</p>
+        
+        <div class="services-grid-list">
+            {% for service in all_services %}
+            <div class="service-list-item">
+                <a href="{{ url_for('service_detail', slug=service.slug) }}">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ service.name }}</span>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="services-action">
+            <a href="#contato" class="btn btn-primary">Solicitar Orçamento</a>
+        </div>
+    </div>
+</section>
+
+<!-- Sobre Section com layout mais moderno -->
+<section id="sobre" class="about">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-image">
+                <div class="image-frame">
+                    <img src="{{ url_for('static', filename='uploads/images/medium/wellington-curvelo.jpg') }}" alt="Wellington Curvelo" onerror="this.src='{{ url_for('static', filename='images/placeholder_profile.jpg') }}'">
+                </div>
+            </div>
+            <div class="about-content">
+                <h2>Sobre Wellington Curvelo</h2>
+                <div class="divider"></div>
+                <p>Com mais de 18 anos de experiência no setor de documentação veicular, Wellington Curvelo oferece uma variedade de serviços para veículos novos, usados e seminovos.</p>
+                <p>Nossa estrutura é exclusiva, para atender, reduzindo os prazos, e garantindo a eficiência em todos os processos, como despachante credenciado pelo Detran-RJ. Atendemos clientes do Rio de Janeiro e diversas localidades do estado.</p>
+                
+                <div class="about-features">
+                    <div class="feature-item">
+                        <i class="fas fa-certificate"></i>
+                        <span>Credenciado pelo Detran</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Formação especializada</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Atendimento ágil</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-headset"></i>
+                        <span>Suporte personalizado</span>
+                    </div>
+                </div>
+                
+                <a href="{{ url_for('contact') }}" class="btn btn-primary">Fale com Wellington</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Por que escolher Section com cards mais atrativos -->
+<section class="why-choose">
+    <div class="container">
+        <h2 class="section-title">Por que escolher a WDespachante?</h2>
+        <p class="section-description">Oferecemos soluções completas para facilitar sua vida, economizar seu tempo e garantir tranquilidade nos processos junto ao Detran.</p>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3>Facilidade</h3>
+                <p>Simplificamos todos os processos burocráticos, cuidando de toda documentação para você não ter preocupação.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3>Tranquilidade</h3>
+                <p>Acompanhamento total do seu processo, mantendo você informado em cada etapa do andamento.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Segurança</h3>
+                <p>Processos realizados com total conformidade legal, garantindo sua tranquilidade e proteção.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Economia de Tempo</h3>
+                <p>Evite filas e burocracia. Cuidamos de todo o processo para que você não precise se deslocar várias vezes ao Detran.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-gavel"></i>
+                </div>
+                <h3>Segurança Jurídica</h3>
+                <p>Garantimos que todos os processos sejam realizados dentro das normas legais, evitando problemas futuros com sua documentação.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h3>Atendimento Personalizado</h3>
+                <p>Cada cliente recebe atenção individualizada, com orientação completa sobre seu processo específico.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Depoimentos Section com design mais moderno -->
+<section class="testimonials">
+    <div class="container">
+        <h2 class="section-title">O que nossos clientes dizem</h2>
+        <p class="section-description">Veja a opinião de quem já utilizou nossos serviços e comprovou nossa qualidade e eficiência.</p>
+        
+        <div class="testimonial-slider">
+            {% for testimonial in testimonials %}
+            <div class="testimonial-item">
+                <div class="testimonial-content">
+                    <i class="fas fa-quote-left quote-icon"></i>
+                    <p>"{{ testimonial.content }}"</p>
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-image">
+                        {% if testimonial.image %}
+                        <img src="{{ url_for('static', filename='uploads/images/thumb/' + testimonial.image) }}" alt="{{ testimonial.name }}">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='images/placeholder_profile.jpg') }}" alt="{{ testimonial.name }}">
+                        {% endif %}
+                    </div>
+                    <div class="author-info">
+                        <h4>{{ testimonial.name }}</h4>
+                        {% if testimonial.location %}
+                        <p class="testimonial-location">{{ testimonial.location }}</p>
+                        {% endif %}
+                        <div class="testimonial-rating">
+                            {% for i in range(testimonial.rating) %}
+                            <i class="fas fa-star"></i>
+                            {% endfor %}
+                            {% for i in range(5 - testimonial.rating) %}
+                            <i class="far fa-star"></i>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Blog Section com cards mais modernos -->
+<section class="blog-preview">
+    <div class="container">
+        <h2 class="section-title">Últimas Notícias do Blog</h2>
+        <p class="section-description">Mantenha-se atualizado com as últimas novidades, dicas e informações sobre o mundo automotivo e o Detran em nosso blog.</p>
+        
+        <div class="blog-grid">
+            {% for article in recent_articles %}
+            <div class="blog-card">
+                {% if article.featured_image %}
+                <div class="blog-image">
+                    <img src="{{ url_for('static', filename='uploads/images/medium/' + article.featured_image) }}" alt="{{ article.title }}">
+                </div>
+                {% endif %}
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span class="blog-date"><i class="fas fa-calendar-alt"></i> {{ article.publication_date.strftime('%d/%m/%Y') }}</span>
+                        {% if article.category %}
+                        <span class="blog-category"><i class="fas fa-folder"></i> {{ article.category.name }}</span>
+                        {% endif %}
+                    </div>
+                    <h3><a href="{{ url_for('news_detail', slug=article.slug) }}">{{ article.title }}</a></h3>
+                    <p>{{ article.summary or article.meta_description or article.content|striptags|truncate(100) }}</p>
+                    <a href="{{ url_for('news_detail', slug=article.slug) }}" class="read-more">Leia mais <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="blog-action">
+            <a href="{{ url_for('blog') }}" class="btn btn-primary">Ver todas as Notícias</a>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section com melhor interatividade -->
+<section class="faq-section">
+    <div class="container">
+        <h2 class="section-title">Perguntas Frequentes</h2>
+        <p class="section-description">Tire suas dúvidas sobre nossos serviços e processos junto ao Detran.</p>
+        
+        <div class="faq-container">
+            {% for faq in faqs %}
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>{{ faq.question }}</h3>
+                    <span class="faq-toggle"><i class="fas fa-plus"></i></span>
+                </div>
+                <div class="faq-answer">
+                    <p>{{ faq.answer }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="faq-action">
+            <p>Não encontrou o que procurava?</p>
+            <a href="{{ url_for('contact') }}" class="btn btn-primary">Entre em Contato</a>
+        </div>
+    </div>
+</section>
+
+<!-- Contato Section com layout mais moderno -->
+<section id="contato" class="contact">
+    <div class="container">
+        <h2 class="section-title">Entre em Contato</h2>
+        <p class="section-description">Estamos prontos para ajudar você com todas as suas necessidades de documentação veicular.</p>
+        
+        <div class="contact-container">
+            <div class="contact-form-container">
+                <form action="{{ url_for('contact') }}" method="post" class="contact-form">
+                    <div class="form-group">
+                        <label for="name">Nome Completo</label>
+                        <input type="text" id="name" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <input type="email" id="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Telefone</label>
+                        <input type="tel" id="phone" name="phone" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Assunto</label>
+                        <input type="text" id="subject" name="subject" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mensagem</label>
+                        <textarea id="message" name="message" class="form-control" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Enviar Mensagem</button>
+                </form>
+            </div>
+            
+            <div class="contact-info">
+                <div class="info-section">
+                    <h3>Informações de Contato</h3>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Endereço</h4>
+                            <p>Rio de Janeiro, RJ</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>Telefone</h4>
+                            <p>(21) 99999-9999</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="info-content">
+                            <h4>E-mail</h4>
+                            <p>contato@wellingtondespachante.com.br</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="social-section">
+                    <h3>Redes Sociais</h3>
+                    <div class="social-icons">
+                        <a href="#" target="_blank" class="facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" target="_blank" class="instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" target="_blank" class="whatsapp"><i class="fab fa-whatsapp"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Pronto para resolver sua documentação veicular?</h2>
+        <p>Entre em contato agora mesmo e descubra como podemos ajudar você a resolver todas as suas necessidades junto ao Detran de forma rápida e segura.</p>
+        <div class="cta-buttons">
+            <a href="tel:+552199999999" class="btn btn-primary"><i class="fas fa-phone"></i> Ligar Agora</a>
+            <a href="https://wa.me/5521999999999" target="_blank" class="btn btn-secondary"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+        </div>
+    </div>
+</section>
+
+<!-- Links Úteis Section -->
+<section class="useful-links">
+    <div class="container">
+        <h2 class="section-title">Links Úteis</h2>
+        <p class="section-description">Acesse informações importantes e serviços online relacionados à documentação veicular.</p>
+        
+        <div class="links-grid">
+            <div class="link-card">
+                <a href="https://www.detran.rj.gov.br/" target="_blank">
+                    <div class="link-icon">
+                        <i class="fas fa-external-link-alt"></i>
+                    </div>
+                    <h3>Detran RJ</h3>
+                    <p>Site oficial do Detran do Rio de Janeiro</p>
+                </a>
+            </div>
+            
+            <div class="link-card">
+                <a href="https://www.gov.br/pt-br/servicos/consultar-pontuacao-na-carteira-de-habilitacao" target="_blank">
+                    <div class="link-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <h3>Consulta de CNH</h3>
+                    <p>Verifique a pontuação e situação da sua CNH</p>
+                </a>
+            </div>
+            
+            <div class="link-card">
+                <a href="https://www.gov.br/pt-br/servicos/consultar-multas-de-transito" target="_blank">
+                    <div class="link-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Consulta de Multas</h3>
+                    <p>Verifique multas de trânsito do seu veículo</p>
+                </a>
+            </div>
+            
+            <div class="link-card">
+                <a href="https://www.gov.br/pt-br/servicos/transferir-veiculo" target="_blank">
+                    <div class="link-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <h3>Transferência de Veículos</h3>
+                    <p>Informações sobre o processo de transferência</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Detrans do Brasil Section -->
+<section class="detrans-section">
+    <div class="container">
+        <h2 class="section-title">Detrans do Brasil</h2>
+        <p class="section-description">Acesse os sites dos Detrans de todos os estados brasileiros.</p>
+        
+        <div class="detrans-search">
+            <input type="text" id="detran-search" class="form-control" placeholder="Buscar por estado...">
+        </div>
+        
+        <h3 class="detrans-subtitle">Selecione o estado:</h3>
+        
+        <div class="detrans-grid">
+            {% for detran in detrans %}
+            <div class="detran-card">
+                <a href="{{ detran.url }}" target="_blank">
+                    <div class="detran-flag">
+                        {% if detran.flag %}
+                        <img src="{{ url_for('static', filename='images/flags/' + detran.flag) }}" alt="Bandeira {{ detran.state }}">
+                        {% else %}
+                        <div class="detran-flag-placeholder">
+                            <span>{{ detran.state[:2] }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="detran-info">
+                        <h4>Detran {{ detran.state }}</h4>
+                        <p>{{ detran.full_name }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="detrans-action">
+            <p>Precisa de ajuda com serviços de outros estados?</p>
+            <p>Podemos ajudar com processos em qualquer Detran do Brasil.</p>
+            <a href="{{ url_for('contact') }}" class="btn btn-primary">Fale Conosco</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // FAQ Toggle
+    document.addEventListener('DOMContentLoaded', function() {
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            
+            question.addEventListener('click', () => {
+                item.classList.toggle('active');
+                
+                // Fechar outros itens quando um é aberto
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+            });
+        });
+        
+        // Filtro para Detrans
+        const searchInput = document.getElementById('detran-search');
+        const detranCards = document.querySelectorAll('.detran-card');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                detranCards.forEach(card => {
+                    const stateName = card.querySelector('h4').textContent.toLowerCase();
+                    const fullName = card.querySelector('p').textContent.toLowerCase();
+                    
+                    if (stateName.includes(searchTerm) || fullName.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ error_title|default('Erro') }} - Wellington Despachante RJ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 50px 20px;
+            min-height: 60vh;
+        }
+        .error-icon {
+            font-size: 5rem;
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        .error-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .error-message {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #555;
+            max-width: 600px;
+        }
+        .error-actions {
+            display: flex;
+            gap: 15px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary {
+            background-color: #7f8c8d;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-secondary:hover {
+            background-color: #6c7a7d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container site-header">
+            <div class="logo">
+                <a href="{{ url_for('index') }}">Wellington Despachante RJ</a>
+            </div>
+            <nav class="main-nav">
+                <ul class="flex justify-center items-center space-x-6 text-gray-700">
+                    <li><a href="{{ url_for('index') }}">Início</a></li>
+                    <li><a href="{{ url_for('blog') }}">Blog</a></li>
+                    <li><a href="#">Contato</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="error-container">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h1 class="error-title">{{ error_title|default('Ocorreu um erro') }}</h1>
+            <p class="error-message">{{ error_message|default('Estamos enfrentando um problema técnico. Por favor, tente novamente mais tarde.') }}</p>
+            <div class="error-actions">
+                <a href="{{ url_for('index') }}" class="btn">Voltar para a página inicial</a>
+                <a href="javascript:history.back()" class="btn btn-secondary">Voltar para a página anterior</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Sobre Nós</h3>
+                    <p>Wellington Despachante RJ oferece serviços de despachante de alta qualidade no Rio de Janeiro, com foco em atendimento personalizado e soluções eficientes.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Links Rápidos</h3>
+                    <ul class="flex justify-center space-x-4">
+                        <li><a href="{{ url_for('index') }}">Início</a></li>
+                        <li><a href="{{ url_for('blog') }}">Blog</a></li>
+                        <li><a href="#">Contato</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section contact">
+                    <h3>Contato</h3>
+                    <p><i class="fas fa-phone"></i> (21) 99999-9999</p>
+                    <p><i class="fas fa-envelope"></i> contato@wellingtondespachante.com.br</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Rio de Janeiro, RJ</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; {{ now.year }} Wellington Despachante RJ. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
+ 

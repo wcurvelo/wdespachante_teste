@@ -1,0 +1,226 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block head_extra %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<header class="admin-header">
+    <div class="admin-header-title">
+        <h2><i class="ri-dashboard-line"></i> Dashboard</h2>
+    </div>
+    <div class="admin-dashboard-actions">
+        <a href="{{ url_for('news.create_view') }}" class="btn btn-primary"><i class="ri-add-line"></i> Nova Notícia</a>
+        <a href="{{ url_for('category.create_view') }}" class="btn"><i class="ri-add-line"></i> Nova Categoria</a>
+    </div>
+</header>
+
+<!-- Stat Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="ri-newspaper-line"></i></div>
+        <div class="stat-info">
+            <p>Total de Notícias</p>
+            <span>{{ stats.total_news }}</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="ri-chat-1-line"></i></div>
+        <div class="stat-info">
+            <p>Comentários Pendentes</p>
+            <span>{{ stats.pending_comments }}</span>
+        </div>
+        {% if stats.pending_comments > 0 %}
+            <a href="{{ url_for('comments_list', status='pending') }}" class="stat-action">Revisar</a>
+        {% endif %}
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="ri-eye-line"></i></div>
+        <div class="stat-info">
+            <p>Visualizações (Hoje)</p>
+            <span>{{ stats.views_today }}</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="ri-group-line"></i></div>
+        <div class="stat-info">
+            <p>Usuários Ativos</p>
+            <span>{{ stats.total_users }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="admin-content-layout">
+    <div class="admin-main-content">
+        <!-- Notícias Recentes -->
+        <div class="form-card">
+            <div class="card-header">
+                <h3><i class="ri-newspaper-line"></i> Notícias Recentes</h3>
+                <a href="{{ url_for('news.index_view') }}" class="view-all-link">Ver todas <i class="ri-arrow-right-s-line"></i></a>
+            </div>
+            <div class="table-responsive">
+                <table class="table-styled">
+                    <tbody>
+                        {% for news in latest_news %}
+                        <tr>
+                            <td class="user-cell">
+                                {% if news.featured_image %}
+                                <img src="{{ url_for('static', filename='uploads/images/thumb/' + news.featured_image) }}" alt="Thumbnail" class="avatar-small">
+                                {% else %}
+                                <div class="user-avatar-placeholder avatar-small"><i class="ri-image-line"></i></div>
+                                {% endif %}
+                                <span>{{ news.title|truncate(60) }}</span>
+                            </td>
+                            <td><span class="badge status-{{ news.status|lower }}">{{ news.status|capitalize }}</span></td>
+                            <td>
+                                <div class="actions-group">
+                                    <a href="{{ url_for('edit_news_article', article_id=news.id) }}" class="btn-action btn-edit" title="Editar"><i class="ri-pencil-line"></i></a>
+                                    <a href="{{ url_for('news_detail', slug=news.slug) }}" class="btn-action btn-view" title="Visualizar" target="_blank"><i class="ri-external-link-line"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-center">Nenhuma notícia recente.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Comentários Recentes -->
+        <div class="form-card">
+            <div class="card-header">
+                <h3><i class="ri-chat-1-line"></i> Comentários Recentes</h3>
+                <a href="{{ url_for('comment.index_view') }}" class="view-all-link">Ver todos <i class="ri-arrow-right-s-line"></i></a>
+            </div>
+            <div class="table-responsive">
+                <table class="table-styled">
+                    <tbody>
+                        {% for comment in recent_comments %}
+                        <tr>
+                            <td class="user-cell">
+                                <div class="user-avatar-placeholder avatar-small"><i class="ri-user-line"></i></div>
+                                <span><strong>{{ comment.author }}</strong> em "{{ comment.news_article.title|truncate(30) }}"</span>
+                            </td>
+                            <td><span class="badge status-{{ 'active' if comment.approved else 'pending' }}">{{ 'Aprovado' if comment.approved else 'Pendente' }}</span></td>
+                            <td>
+                                <div class="actions-group">
+                                    {% if not comment.approved %}
+                                    <form action="{{ url_for('comment.index_view') }}" method="POST" style="display:inline;">
+                                        <input type="hidden" name="action" value="approve">
+                                        <input type="hidden" name="id" value="{{ comment.id }}">
+                                        <button type="submit" class="btn-action btn-activate" title="Aprovar"><i class="ri-check-line"></i></button>
+                                    </form>
+                                    {% endif %}
+                                    <a href="{{ url_for('comment.index_view') }}" class="btn-action btn-edit" title="Moderar"><i class="ri-discuss-line"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3" class="text-center">Nenhum comentário recente.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-sidebar-content">
+        <!-- Gráficos -->
+        <div class="form-card">
+            <div class="card-header">
+                <h3><i class="ri-pie-chart-line"></i> Notícias por Status</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+        <div class="form-card">
+            <div class="card-header">
+                <h3><i class="ri-bar-chart-2-line"></i> Notícias por Categoria</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Configuração dos Gráficos ---
+    const chartFontColor = '#a0aec0';
+    const chartGridColor = 'rgba(255, 255, 255, 0.1)';
+
+    // Gráfico de Status (Doughnut)
+    const statusCtx = document.getElementById('statusChart')?.getContext('2d');
+    if (statusCtx && typeof Chart !== 'undefined') {
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Publicadas', 'Rascunhos', 'Agendadas'],
+                datasets: [{
+                    data: [
+                        {{ stats.news_by_status.published|default(0) }}, 
+                        {{ stats.news_by_status.draft|default(0) }}, 
+                        {{ stats.news_by_status.scheduled|default(0) }}
+                    ],
+                    backgroundColor: ['#10b981', '#6b7280', '#f59e0b'],
+                    borderColor: '#1f2937',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: chartFontColor, padding: 15, usePointStyle: true, pointStyle: 'circle' }
+                    }
+                }
+            }
+        });
+    }
+
+    // Gráfico de Categorias (Bar) - Dados de exemplo, pois não estão sendo passados
+    const categoryCtx = document.getElementById('categoryChart')?.getContext('2d');
+    if (categoryCtx && typeof Chart !== 'undefined') {
+        new Chart(categoryCtx, {
+            type: 'bar',
+            data: {
+                labels: [], // Ex: {{ stats.category_labels|safe }}
+                datasets: [{
+                    label: 'Notícias',
+                    data: [], // Ex: {{ stats.category_counts|safe }}
+                    backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: chartFontColor },
+                        grid: { display: false }
+                    },
+                    y: {
+                        ticks: { color: chartFontColor, precision: 0 },
+                        grid: { color: chartGridColor }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

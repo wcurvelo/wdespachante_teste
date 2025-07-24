@@ -1,0 +1,195 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Gerenciar Notícias{% endblock %}
+
+{% block content %}
+            <header class="admin-header">
+                <div class="admin-header-title">
+                    <h2>Gerenciar Notícias</h2>
+                    <span class="news-count">{{ articles.total }} notícia(s) encontrada(s)</span>
+                </div>
+                <div class="admin-header-actions">
+                    <div class="user-welcome">
+                        <span>Bem-vindo,</span>
+                        <strong>{{ current_user.username }}</strong>
+                    </div>
+                    <a href="{{ url_for('new_news_article') }}" class="btn btn-primary"><i class="ri-add-line"></i> Adicionar Nova</a>
+                </div>
+            </header>
+
+            <div class="news-list-card">
+                <div class="news-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon news-icon">
+                            <i class="ri-newspaper-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Total de Notícias</h4>
+                            <p>{{ articles.total }}</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon published-icon">
+                            <i class="ri-check-double-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Publicadas</h4>
+                            <p>{{ articles.items|selectattr('status', 'equalto', 'publicada')|list|length }}</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon draft-icon">
+                            <i class="ri-draft-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h4>Rascunhos</h4>
+                            <p>{{ articles.items|selectattr('status', 'equalto', 'rascunho')|list|length }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="search-filter-container">
+                    <form method="GET" action="{{ url_for('news_list') }}" class="news-filters">
+                        <div class="search-box">
+                            <i class="ri-search-line"></i>
+                        <input type="text" name="search" placeholder="Buscar por título ou conteúdo..." value="{{ request.args.get('search', '') }}">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <div class="filter-select-group">
+                                <label for="status-select">Status</label>
+                                <select name="status" id="status-select" class="filter-select">
+                            <option value="">Todos os Status</option>
+                        <option value="published" {% if request.args.get('status') == 'published' %}selected{% endif %}>Publicada</option>
+                        <option value="draft" {% if request.args.get('status') == 'draft' %}selected{% endif %}>Rascunho</option>
+                        <option value="scheduled" {% if request.args.get('status') == 'scheduled' %}selected{% endif %}>Agendada</option>
+                        </select>
+                            </div>
+                            
+                            <div class="filter-select-group">
+                                <label for="category-select">Categoria</label>
+                                <select name="category" id="category-select" class="filter-select">
+                            <option value="">Todas as Categorias</option>
+                        {% for category in categories %}
+                        <option value="{{ category.name }}" {% if request.args.get('category') == category.name %}selected{% endif %}>{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-actions">
+                            <button type="submit" class="btn filter-btn"><i class="ri-filter-3-line"></i> Filtrar</button>
+                            <a href="{{ url_for('news_list') }}" class="btn clear-btn"><i class="ri-refresh-line"></i> Limpar</a>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="news-table-container">
+                    <table class="news-table">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Autor</th>
+                                <th>Categoria</th>
+                                <th>Tags</th>
+                                <th>Status</th>
+                                <th>Data Publicação</th>
+                                <th class="actions-column">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for article in articles.items %}
+                            <tr>
+                                <td class="title-column">
+                                    <div class="news-title-info">
+                                        {% if article.featured_image %}
+                                        <div class="news-thumb">
+                                            <img src="{{ url_for('static', filename='uploads/images/thumb/' + article.featured_image) }}" alt="{{ article.title }}">
+                                        </div>
+                                        {% else %}
+                                        <div class="news-thumb news-thumb-placeholder">
+                                            <i class="ri-file-text-line"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div class="article-title">{{ article.title }}</div>
+                                    </div>
+                                </td>
+                    <td>{{ article.author.name if article.author else 'N/A' }}</td>
+                    <td>{{ article.category.name if article.category else '-' }}</td>
+                                <td class="tags-column">
+                                    {% if article.tags %}
+                                        <div class="tags-container">
+                                            {% for tag in article.tags.split(',')[:3] %}
+                                                <span class="tag-badge">{{ tag.strip() }}</span>
+                                            {% endfor %}
+                                            {% if article.tags.split(',')|length > 3 %}
+                                                <span class="tag-badge tag-more">+{{ article.tags.split(',')|length - 3 }}</span>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                        <span class="status-badge status-{{ article.status }}">{{ article.status|replace('published', 'Publicado')|replace('draft', 'Rascunho')|replace('scheduled', 'Agendado')|capitalize }}</span>
+                                </td>
+                                <td>{{ article.publication_date.strftime('%d/%m/%Y %H:%M') }}</td>
+                                <td class="actions-column">
+                                    <div class="news-actions">
+                                        <a href="{{ url_for('news_detail', slug=article.slug) }}" class="btn-action btn-view" title="Visualizar" target="_blank"><i class="ri-eye-line"></i></a>
+                                        <a href="{{ url_for('preview_news_article', article_id=article.id) }}" class="btn-action btn-preview" title="Prévia" target="_blank"><i class="ri-file-search-line"></i></a>
+                                        <a href="{{ url_for('edit_news_article', article_id=article.id) }}" class="btn-action btn-edit" title="Editar"><i class="ri-edit-line"></i></a>
+                                    <form action="{{ url_for('delete_news_article', article_id=article.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir esta notícia?');">
+                                            <button type="submit" class="btn-action btn-delete" title="Excluir"><i class="ri-delete-bin-line"></i></button>
+                                    </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="7" class="no-results">
+                                    <div class="no-results-message">
+                                        <i class="ri-file-search-line"></i>
+                                        <p>Nenhuma notícia encontrada com os filtros aplicados.</p>
+                                        <a href="{{ url_for('news_list') }}" class="btn btn-primary">Ver todas as notícias</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-container">
+                    {% if articles.total > 0 %}
+                    <div class="pagination-info">
+                        Mostrando {{ articles.items|length }} de {{ articles.total }} notícias
+                    </div>
+                    {% endif %}
+                    
+                    <div class="pagination">
+                        {% if articles.has_prev %}
+            <a href="{{ url_for('news_list', page=articles.prev_num, **request.args) }}" class="pagination-btn prev-btn"><i class="ri-arrow-left-s-line"></i> Anterior</a>
+                        {% endif %}
+                        
+                        <div class="pagination-numbers">
+                    {% for page_num in articles.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                        {% if page_num %}
+                            {% if articles.page == page_num %}
+                            <a href="{{ url_for('news_list', page=page_num, **request.args) }}" class="pagination-number active">{{ page_num }}</a>
+                            {% else %}
+                            <a href="{{ url_for('news_list', page=page_num, **request.args) }}" class="pagination-number">{{ page_num }}</a>
+                            {% endif %}
+                        {% else %}
+                                    <span class="pagination-ellipsis">...</span>
+                        {% endif %}
+                    {% endfor %}
+                        </div>
+                        
+                    {% if articles.has_next %}
+                <a href="{{ url_for('news_list', page=articles.next_num, **request.args) }}" class="pagination-btn next-btn">Próximo <i class="ri-arrow-right-s-line"></i></a>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+{% endblock %} 

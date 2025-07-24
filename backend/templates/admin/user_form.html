@@ -1,0 +1,89 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Editar Usuário{% endblock %}
+
+{% block content %}
+<header class="admin-header">
+    <div class="admin-header-title">
+        <h2><i class="ri-user-settings-line"></i> Editar Usuário: {{ user.username }}</h2>
+    </div>
+    <div class="admin-header-actions">
+        <a href="{{ url_for('users_list') }}" class="btn btn-secondary"><i class="ri-arrow-left-line"></i> Voltar para lista</a>
+    </div>
+</header>
+
+<div class="admin-content-layout-single-column">
+    <div class="form-card">
+        <h3 class="form-section-title">Informações do Usuário</h3>
+        <form method="POST" action="{{ url_for('user_form', user_id=user.id) }}">
+            <div class="form-group">
+                <label for="username">Nome de Usuário</label>
+                <input type="text" id="username" name="username" value="{{ user.username }}" readonly>
+                <small>O nome de usuário não pode ser alterado.</small>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" required>
+            </div>
+            <div class="form-group">
+                <label for="role">Papel</label>
+                <select id="role" name="role" required>
+                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                    <option value="editor" {% if user.role == 'editor' %}selected{% endif %}>Editor</option>
+                    <option value="redator" {% if user.role == 'redator' %}selected{% endif %}>Redator</option>
+                    <option value="revisor" {% if user.role == 'revisor' %}selected{% endif %}>Revisor</option>
+                </select>
+            </div>
+            <div class="form-group-checkbox">
+                <input type="checkbox" id="is_active" name="is_active" value="true" {% if user.is_active %}checked{% endif %}>
+                <label for="is_active">Usuário Ativo</label>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="ri-save-3-line"></i> Atualizar Usuário</button>
+                <a href="{{ url_for('users_list') }}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="form-card">
+        <h3 class="form-section-title">Alterar Senha</h3>
+         <form method="POST" action="{{ url_for('reset_user_password', user_id=user.id) }}">
+            <div class="form-group">
+                <label for="new_password">Nova Senha</label>
+                <input type="password" id="new_password" name="new_password" required minlength="6">
+                <small>A senha deve ter pelo menos 6 caracteres.</small>
+            </div>
+            <div class="form-group">
+                <label for="confirm_new_password">Confirmar Nova Senha</label>
+                <input type="password" id="confirm_new_password" name="confirm_new_password" required minlength="6">
+                 <small id="passwordUpdateError" class="text-danger" style="display: none;">As senhas não coincidem.</small>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary"><i class="ri-key-2-line"></i> Redefinir Senha</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordForm = document.querySelector('form[action*="reset_user_password"]');
+    if (passwordForm) {
+        passwordForm.addEventListener('submit', function(e) {
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_new_password').value;
+            const errorElement = document.getElementById('passwordUpdateError');
+
+            if (newPassword !== confirmPassword) {
+                e.preventDefault();
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

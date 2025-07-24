@@ -1,0 +1,15 @@
+# Regras para todos os robôs de busca
+User-agent: *
+
+# Não permitir que a pasta do admin seja indexada
+Disallow: /admin/
+Disallow: /admin/*
+
+# Não permitir que a página de login seja indexada
+Disallow: /login
+
+# Não permitir que páginas de resultados de busca interna sejam indexadas
+Disallow: /search
+
+# Apontar para o sitemap
+Sitemap: {{ url_for('sitemap', _external=True) }} 

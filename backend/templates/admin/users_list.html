@@ -1,0 +1,263 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Gerenciar Usuários{% endblock %}
+
+{% block content %}
+<header class="admin-header">
+    <div class="admin-header-title">
+        <h2><i class="ri-group-line"></i> Gerenciar Usuários</h2>
+    </div>
+</header>
+
+<div class="admin-content-layout">
+    <div class="admin-main-content">
+        <!-- Stat Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="ri-group-line"></i></div>
+                <div class="stat-info">
+                    <p>Total de Usuários</p>
+                    <span>{{ users.total }}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="ri-shield-user-line"></i></div>
+                <div class="stat-info">
+                    <p>Administradores</p>
+                    <span>{{ admin_count|default(0) }}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="ri-user-follow-line"></i></div>
+                <div class="stat-info">
+                    <p>Usuários Ativos</p>
+                    <span>{{ active_count|default(0) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela e Filtros -->
+        <div class="form-card">
+            <div class="users-filter">
+                <form method="GET" action="{{ url_for('users_list') }}" class="filter-form">
+                    <div class="search-box">
+                        <i class="ri-search-line"></i>
+                        <input type="text" name="search" placeholder="Buscar por nome ou email..." value="{{ search_query or '' }}">
+                    </div>
+                    <div class="filter-selects">
+                        <select name="role" class="filter-select">
+                            <option value="">Todos os Papéis</option>
+                            <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Admin</option>
+                            <option value="editor" {% if role_filter == 'editor' %}selected{% endif %}>Editor</option>
+                            <option value="redator" {% if role_filter == 'redator' %}selected{% endif %}>Redator</option>
+                            <option value="revisor" {% if role_filter == 'revisor' %}selected{% endif %}>Revisor</option>
+                        </select>
+                        <select name="status" class="filter-select">
+                            <option value="">Todos os Status</option>
+                            <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Ativo</option>
+                            <option value="inactive" {% if status_filter == 'inactive' %}selected{% endif %}>Inativo</option>
+                        </select>
+                    </div>
+                    <div class="filter-buttons">
+                        <button type="submit" class="btn-filter"><i class="ri-filter-3-line"></i> Filtrar</button>
+                        <a href="{{ url_for('users_list') }}" class="btn-clear"><i class="ri-refresh-line"></i> Limpar</a>
+                    </div>
+                </form>
+            </div>
+
+            {% if users.items %}
+            <div class="table-responsive">
+                <table class="table-styled">
+                    <thead>
+                        <tr>
+                            <th>Usuário</th>
+                            <th>Email</th>
+                            <th>Papel</th>
+                            <th>Status</th>
+                            <th class="actions-header">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users.items %}
+                        <tr>
+                            <td class="user-cell">
+                                <div class="user-avatar-placeholder">
+                                    <i class="ri-user-line"></i>
+                                </div>
+                                <span>{{ user.username }}</span>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td><span class="badge role-{{ user.role|lower }}">{{ user.role|capitalize }}</span></td>
+                            <td>
+                                {% if user.is_active %}
+                                <span class="badge status-active">Ativo</span>
+                                {% else %}
+                                <span class="badge status-inactive">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="actions-group">
+                                    <a href="{{ url_for('user_form', user_id=user.id) }}" class="btn-action btn-edit" title="Editar"><i class="ri-pencil-line"></i></a>
+                                    <form action="{{ url_for('toggle_user_active', user_id=user.id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja {{ 'desativar' if user.is_active else 'ativar' }} este usuário?');" style="display: inline;">
+                                        <button type="submit" class="btn-action {{ 'btn-deactivate' if user.is_active else 'btn-activate' }}" title="{{ 'Desativar' if user.is_active else 'Ativar' }}"><i class="ri-{{ 'user-unfollow-line' if user.is_active else 'user-follow-line' }}"></i></button>
+                                    </form>
+                                    <button type="button" class="btn-action btn-password" title="Redefinir Senha" onclick="openResetPasswordModal('{{ user.id }}', '{{ user.username }}')"><i class="ri-key-2-line"></i></button>
+                                    <button type="button" class="btn-action btn-delete" title="Excluir Usuário" onclick="confirmDelete('{{ user.id }}', '{{ user.username }}')"><i class="ri-delete-bin-line"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            <div class="pagination">
+                {% if users.has_prev %}
+                    <a href="{{ url_for('users_list', page=users.prev_num, **request.args) }}">&laquo; Anterior</a>
+                {% endif %}
+                {% for page_num in users.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if page_num %}
+                        <a href="{{ url_for('users_list', page=page_num, **request.args) }}" class="{{ 'active' if users.page == page_num else '' }}">{{ page_num }}</a>
+                    {% else %}
+                        <span class="ellipsis">...</span>
+                    {% endif %}
+                {% endfor %}
+                {% if users.has_next %}
+                    <a href="{{ url_for('users_list', page=users.next_num, **request.args) }}">Próximo &raquo;</a>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="no-results">
+                <i class="ri-user-search-line"></i>
+                <p>Nenhum usuário encontrado com os filtros aplicados.</p>
+                <a href="{{ url_for('users_list') }}" class="btn btn-primary">Limpar filtros e ver todos</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="admin-sidebar-content">
+        <div class="form-card">
+            <h3 class="form-section-title"><i class="ri-user-add-line"></i> Adicionar Novo Usuário</h3>
+            <form method="POST" action="{{ url_for('users_list') }}" id="addUserForm">
+                <div class="form-group">
+                    <label for="username">Nome de Usuário</label>
+                    <input type="text" id="username" name="username" required minlength="3">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" required minlength="6">
+                    <small>Mínimo 6 caracteres.</small>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirmar Senha</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required minlength="6">
+                    <small id="passwordError" class="text-danger" style="display: none;">As senhas não coincidem.</small>
+                </div>
+                <div class="form-group">
+                    <label for="role">Papel</label>
+                    <select id="role" name="role" required>
+                        <option value="revisor" selected>Revisor</option>
+                        <option value="redator">Redator</option>
+                        <option value="editor">Editor</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group-checkbox">
+                    <input type="checkbox" id="is_active" name="is_active" value="true" checked>
+                    <label for="is_active">Usuário Ativo</label>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary"><i class="ri-save-3-line"></i> Criar Usuário</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Redefinir Senha -->
+<div id="resetPasswordModal" class="modal-overlay" style="display:none;">
+    <div class="modal-dialog">
+        <div class="modal-header">
+            <h3>Redefinir Senha</h3>
+            <button class="close-button" onclick="closeModal('resetPasswordModal')">&times;</button>
+        </div>
+        <form id="resetPasswordForm" method="POST">
+            <div class="modal-body">
+                <p>Nova senha para <strong id="resetPasswordUsername"></strong>:</p>
+                <div class="form-group">
+                    <label for="new_password">Nova Senha</label>
+                    <input type="password" id="new_password" name="new_password" required minlength="6">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('resetPasswordModal')">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Salvar Senha</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validação de senha para o formulário de adição
+    const addUserForm = document.getElementById('addUserForm');
+    if (addUserForm) {
+        addUserForm.addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const passwordError = document.getElementById('passwordError');
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                passwordError.style.display = 'block';
+                document.getElementById('confirm_password').focus();
+            } else {
+                passwordError.style.display = 'none';
+            }
+        });
+    }
+
+    // Fecha modal
+    window.closeModal = function(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Abre modal de redefinir senha
+    window.openResetPasswordModal = function(userId, username) {
+        const form = document.getElementById('resetPasswordForm');
+        form.action = `/admin/users/${userId}/reset_password`;
+        document.getElementById('resetPasswordUsername').innerText = username;
+        document.getElementById('resetPasswordModal').style.display = 'flex';
+    }
+
+    // Confirmação de exclusão
+    window.confirmDelete = function(userId, username) {
+        if (confirm(`Tem certeza que deseja excluir o usuário "${username}"? Esta ação não pode ser desfeita.`)) {
+            // Cria um formulário dinamicamente para enviar um POST para a rota de exclusão
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/users/${userId}/delete`;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // Fechar modal ao clicar no overlay
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal(this.id);
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,193 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Meu Perfil{% endblock %}
+
+{% block content %}
+            <header class="admin-header">
+                <div class="admin-header-title">
+                    <h2>Meu Perfil</h2>
+                    <span class="profile-role">{{ user.role|capitalize }}</span>
+                </div>
+                <div class="admin-header-actions">
+                    <div class="user-welcome">
+                        <span>Bem-vindo,</span>
+                        <strong>{{ current_user.username }}</strong>
+                    </div>
+                </div>
+            </header>
+
+            <div class="profile-container">
+                <div class="profile-sidebar">
+                    <div class="profile-card">
+                        <div class="profile-avatar">
+                            <i class="ri-user-3-fill"></i>
+                        </div>
+                        <div class="profile-info">
+                            <h3>{{ user.username }}</h3>
+                            <span class="profile-badge">{{ user.role|capitalize }}</span>
+                        </div>
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <span class="stat-value">{{ user_news_count|default(0) }}</span>
+                                <span class="stat-label">Notícias</span>
+                            </div>
+                            <div class="profile-stat">
+                                <span class="stat-value">{{ account_age|default('N/A') }}</span>
+                                <span class="stat-label">Dias na plataforma</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-actions">
+                        <a href="{{ url_for('logout') }}" class="btn-logout">
+                            <i class="ri-logout-box-line"></i> Sair da conta
+                        </a>
+                    </div>
+                </div>
+
+                <div class="profile-content">
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <h3><i class="ri-user-settings-line"></i> Informações do Perfil</h3>
+                        </div>
+                        <div class="section-body">
+                            <form method="POST" class="profile-form">
+                                <div class="form-group">
+                                    <label for="username">
+                                        <i class="ri-user-line"></i> Nome de Usuário
+                                    </label>
+                                    <div class="input-with-icon">
+                                        <i class="ri-user-line"></i>
+                                        <input type="text" id="username" name="username" value="{{ user.username }}" readonly>
+                                    </div>
+                                    <small class="form-text">O nome de usuário não pode ser alterado.</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="email">
+                                        <i class="ri-mail-line"></i> Email
+                                    </label>
+                                    <div class="input-with-icon">
+                                        <i class="ri-mail-line"></i>
+                                        <input type="email" id="email" name="email" value="{{ user.email if user.email else '' }}" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="role">
+                                        <i class="ri-shield-user-line"></i> Papel
+                                    </label>
+                                    <div class="input-with-icon">
+                                        <i class="ri-shield-user-line"></i>
+                                        <input type="text" id="role" value="{{ user.role|capitalize }}" readonly>
+                                    </div>
+                                    <small class="form-text">Apenas administradores podem alterar papéis.</small>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary" name="update_profile">
+                                        <i class="ri-save-line"></i> Salvar Alterações
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="profile-section">
+                        <div class="section-header">
+                            <h3><i class="ri-lock-password-line"></i> Alterar Senha</h3>
+                        </div>
+                        <div class="section-body">
+                            <form method="POST" class="profile-form" id="password-form">
+                                <div class="form-group">
+                                    <label for="current_password">
+                                        <i class="ri-lock-line"></i> Senha Atual
+                                    </label>
+                                    <div class="password-input">
+                                        <input type="password" id="current_password" name="current_password">
+                                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('current_password')">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="new_password">
+                                        <i class="ri-lock-password-line"></i> Nova Senha
+                                    </label>
+                                    <div class="password-input">
+                                        <input type="password" id="new_password" name="new_password">
+                                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('new_password')">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                    <small class="form-text">Mínimo de 6 caracteres.</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="confirm_password">
+                                        <i class="ri-checkbox-circle-line"></i> Confirmar Nova Senha
+                                    </label>
+                                    <div class="password-input">
+                                        <input type="password" id="confirm_password" name="confirm_password">
+                                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('confirm_password')">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </div>
+                                    <div id="password-error" class="error-message">As senhas não coincidem</div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary" name="update_password">
+                                        <i class="ri-lock-unlock-line"></i> Atualizar Senha
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        // Validação de senha
+        document.getElementById('password-form').addEventListener('submit', function(e) {
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (newPassword && newPassword !== confirmPassword) {
+                e.preventDefault();
+                document.getElementById('password-error').style.display = 'block';
+            } else {
+                document.getElementById('password-error').style.display = 'none';
+            }
+        });
+
+        // Alternar visibilidade da senha
+        function togglePasswordVisibility(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.parentElement.querySelector('.toggle-password i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'ri-eye-off-line';
+            } else {
+                input.type = 'password';
+                icon.className = 'ri-eye-line';
+            }
+        }
+
+        // Verificar senhas em tempo real
+        document.getElementById('confirm_password').addEventListener('input', function() {
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = this.value;
+            
+            if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+                document.getElementById('password-error').style.display = 'block';
+            } else {
+                document.getElementById('password-error').style.display = 'none';
+            }
+        });
+    </script>
+{% endblock %} 

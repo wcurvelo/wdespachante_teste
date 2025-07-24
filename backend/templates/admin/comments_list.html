@@ -1,0 +1,134 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Gerenciar Comentários{% endblock %}
+
+{% block content %}
+<header class="admin-header">
+    <div class="admin-header-title">
+        <h2><i class="ri-chat-3-line"></i> Gerenciar Comentários</h2>
+    </div>
+</header>
+
+<!-- Stat Cards -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="ri-chat-3-line"></i></div>
+        <div class="stat-info">
+            <p>Total de Comentários</p>
+            <span>{{ approved_count + pending_count }}</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="ri-time-line"></i></div>
+        <div class="stat-info">
+            <p>Pendentes de Aprovação</p>
+            <span>{{ pending_count }}</span>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon"><i class="ri-check-double-line"></i></div>
+        <div class="stat-info">
+            <p>Aprovados</p>
+            <span>{{ approved_count }}</span>
+        </div>
+    </div>
+</div>
+
+<div class="form-card">
+    <!-- Filtros -->
+    <div class="users-filter">
+        <form method="GET" action="{{ url_for('comments_list') }}" class="filter-form">
+            <div class="search-box">
+                <i class="ri-search-line"></i>
+                <input type="text" name="search" placeholder="Buscar por autor ou conteúdo..." value="{{ search_query or '' }}">
+            </div>
+            <div class="filter-selects">
+                <select name="status" class="filter-select" onchange="this.form.submit()">
+                    <option value="all" {% if status_filter == 'all' or not status_filter %}selected{% endif %}>Todos os Status</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pendentes</option>
+                    <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Aprovados</option>
+                </select>
+            </div>
+            <div class="filter-buttons">
+                <button type="submit" class="btn-filter"><i class="ri-filter-3-line"></i> Filtrar</button>
+                <a href="{{ url_for('comments_list') }}" class="btn-clear"><i class="ri-refresh-line"></i> Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    {% if comments.items %}
+    <div class="table-responsive">
+        <table class="table-styled">
+            <thead>
+                <tr>
+                    <th>Autor</th>
+                    <th>Comentário</th>
+                    <th>Em Resposta a</th>
+                    <th>Status</th>
+                    <th class="actions-header">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for comment in comments.items %}
+                <tr>
+                    <td>
+                        <strong>{{ comment.author }}</strong><br>
+                        <small>{{ comment.email }}</small><br>
+                        <small>{{ comment.publication_date.strftime('%d/%m/%y %H:%M') }}</small>
+                    </td>
+                    <td>{{ comment.content|truncate(120) }}</td>
+                    <td>
+                        <a href="{{ url_for('news_detail', slug=comment.news_article.slug) }}#comment-{{ comment.id }}" target="_blank">
+                            {{ comment.news_article.title|truncate(40) }} <i class="ri-external-link-line"></i>
+                        </a>
+                    </td>
+                    <td>
+                        {% if comment.approved %}
+                        <span class="badge status-active">Aprovado</span>
+                        {% else %}
+                        <span class="badge status-pending">Pendente</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="actions-group">
+                            {% if not comment.approved %}
+                            <form action="{{ url_for('approve_comment', comment_id=comment.id) }}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn-action btn-activate" title="Aprovar"><i class="ri-check-line"></i></button>
+                            </form>
+                            {% endif %}
+                            <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir este comentário?');" style="display: inline;">
+                                <button type="submit" class="btn-action btn-delete" title="Excluir"><i class="ri-delete-bin-line"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginação -->
+    <div class="pagination">
+        {% if comments.has_prev %}
+            <a href="{{ url_for('comments_list', page=comments.prev_num, **request.args) }}">&laquo; Anterior</a>
+        {% endif %}
+        {% for page_num in comments.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+            {% if page_num %}
+                <a href="{{ url_for('comments_list', page=page_num, **request.args) }}" class="{{ 'active' if comments.page == page_num else '' }}">{{ page_num }}</a>
+            {% else %}
+                <span class="ellipsis">...</span>
+            {% endif %}
+        {% endfor %}
+        {% if comments.has_next %}
+            <a href="{{ url_for('comments_list', page=comments.next_num, **request.args) }}">Próximo &raquo;</a>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="no-results">
+        <i class="ri-chat-off-line"></i>
+        <p>Nenhum comentário encontrado com os filtros aplicados.</p>
+        <a href="{{ url_for('comments_list') }}" class="btn btn-primary">Limpar filtros e ver todos</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 
