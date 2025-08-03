@@ -38,7 +38,7 @@ app.config['SECRET_KEY'] = os.urandom(24)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(os.path.dirname(os.path.abspath(__file__)), 'instance', 'site.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER_IMAGES'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'images')
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16MB
+app.config['MAX_CONTENT_LENGTH'] = 25 * 1024 * 1024 # 25MB para permitir uploads de 20MB
 
 # Cache
 app.config['CACHE_TYPE'] = 'SimpleCache'
@@ -67,13 +67,15 @@ os.makedirs(os.path.join(app.config['UPLOAD_FOLDER_IMAGES'], 'thumb'), exist_ok=
 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER_IMAGES'], 'medium'), exist_ok=True)
 os.makedirs(os.path.join(app.config['UPLOAD_FOLDER_IMAGES'], 'large'), exist_ok=True)
 
-ALLOWED_VIDEO_EXTENSIONS = {'mp4', 'webm'}
-MAX_VIDEO_SIZE = 100 * 1024 * 1024  # 100MB
-FFMPEG_PATH = 'C:/ffmpeg/bin/ffmpeg.exe'  # Ajuste conforme o seu sistema
-UPLOAD_FOLDER_VIDEOS = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'videos')
-UPLOAD_FOLDER_GALLERY = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'images', 'gallery') # Nova pasta para galeria
-os.makedirs(UPLOAD_FOLDER_VIDEOS, exist_ok=True)
-os.makedirs(UPLOAD_FOLDER_GALLERY, exist_ok=True) # Criar pasta da galeria
+# Configurações de upload
+app.config['UPLOAD_FOLDER_VIDEOS'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'videos')
+app.config['UPLOAD_FOLDER_GALLERY'] = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'images', 'gallery')
+app.config['ALLOWED_VIDEO_EXTENSIONS'] = {'mp4', 'webm'}
+app.config['MAX_VIDEO_SIZE'] = 20 * 1024 * 1024  # 20MB
+app.config['FFMPEG_PATH'] = 'C:/ffmpeg/bin/ffmpeg.exe'  # Ajuste conforme o seu sistema
+
+os.makedirs(app.config['UPLOAD_FOLDER_VIDEOS'], exist_ok=True)
+os.makedirs(app.config['UPLOAD_FOLDER_GALLERY'], exist_ok=True) # Criar pasta da galeria
 
 
 def save_optimized_image(image_file, output_folder):
@@ -116,7 +118,8 @@ def save_gallery_image(image_file):
 
     try:
         filename = secure_filename(f"{uuid.uuid4()}_{image_file.filename}")
-        filepath = os.path.join(UPLOAD_FOLDER_GALLERY, filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER_GALLERY'], filename)
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
         image_file.save(filepath)
         return filename
     except Exception as e:
@@ -129,7 +132,7 @@ def delete_gallery_image_file(filename):
     if not filename:
         return
     try:
-        path = os.path.join(UPLOAD_FOLDER_GALLERY, filename)
+        path = os.path.join(app.config['UPLOAD_FOLDER_GALLERY'], filename)
         if os.path.exists(path):
             os.remove(path)
             logger.info(f"Imagem da galeria deletada: {filename}")
@@ -251,33 +254,40 @@ def custom_news_form(id=None):
         # Processar upload de vídeo
         if video_file and video_file.filename:
             ext = video_file.filename.rsplit('.', 1)[-1].lower()
-            if ext not in ALLOWED_VIDEO_EXTENSIONS:
-                flash('Formato de vídeo inválido. Só MP4 ou WebM.', 'danger')
+            if ext not in app.config['ALLOWED_VIDEO_EXTENSIONS']:
+                flash('Formato de video invalido. So MP4 ou WebM.', 'danger')
                 return render_template('admin/custom_news_form.html', news=article, categories=Category.query.all())
-            if video_file.content_length and video_file.content_length > MAX_VIDEO_SIZE:
-                flash('Arquivo de vídeo muito grande. Máx. 100MB.', 'danger')
+            if video_file.content_length and video_file.content_length > app.config['MAX_VIDEO_SIZE']:
+                flash('Arquivo de video muito grande. Max. 20MB.', 'danger')
                 return render_template('admin/custom_news_form.html', news=article, categories=Category.query.all())
             # Salvar arquivo
             filename = secure_filename(f"{uuid.uuid4()}.{ext}")
-            save_path = os.path.join(UPLOAD_FOLDER_VIDEOS, filename)
+            save_path = os.path.join(app.config['UPLOAD_FOLDER_VIDEOS'], filename)
+            os.makedirs(os.path.dirname(save_path), exist_ok=True)
             video_file.save(save_path)
             # Transcodificar para MP4 se não for mp4
             if ext != 'mp4':
                 mp4_filename = filename.rsplit('.', 1)[0] + '.mp4'
-                mp4_path = os.path.join(UPLOAD_FOLDER_VIDEOS, mp4_filename)
+                mp4_path = os.path.join(app.config['UPLOAD_FOLDER_VIDEOS'], mp4_filename)
                 try:
-                    subprocess.run([FFMPEG_PATH, '-i', save_path, '-c:v', 'libx264', '-preset', 'fast', '-crf', '23', mp4_path], check=True)
-                    os.remove(save_path)
-                    filename = mp4_filename
+                    # Verificar se o ffmpeg está disponível
+                    if not os.path.exists(app.config['FFMPEG_PATH']):
+                        logger.warning("FFmpeg não encontrado. Mantendo o vídeo no formato original.")
+                        video_filename = filename
+                    else:
+                        subprocess.run([app.config['FFMPEG_PATH'], '-i', save_path, '-c:v', 'libx264', '-preset', 'fast', '-crf', '23', mp4_path], check=True)
+                        os.remove(save_path)
+                        video_filename = mp4_filename
                 except Exception as e:
-                    flash(f'Erro ao converter vídeo: {e}', 'danger')
-                    return render_template('admin/custom_news_form.html', news=article, categories=Category.query.all())
-            video_filename = filename
+                    logger.warning(f"Erro ao converter vídeo: {e}. Mantendo o vídeo no formato original.")
+                    video_filename = filename
+            else:
+                video_filename = filename
             video_url = ''  # Limpa o campo URL
         elif video_url:
             # Validação básica de URL
             if not (video_url.startswith('https://www.youtube.com/') or video_url.startswith('https://youtu.be/') or video_url.startswith('https://vimeo.com/')):
-                flash('URL de vídeo inválida. Use YouTube ou Vimeo.', 'danger')
+                flash('URL de video invalida. Use YouTube ou Vimeo.', 'danger')
                 return render_template('admin/custom_news_form.html', news=article, categories=Category.query.all())
             video_filename = None
         else:
