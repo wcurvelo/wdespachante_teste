@@ -82,7 +82,7 @@
                     <div class="mb-4">
                         <label for="video_upload" class="block text-sm font-medium text-gray-300 mb-1">Upload de Vídeo</label>
                         <input type="file" id="video_upload" name="video_upload" accept="video/mp4,video/webm" class="w-full bg-dark-tertiary border border-gray-600 rounded-md p-2 text-white">
-                        <p class="text-xs text-gray-500 mt-1">Formatos aceitos: MP4, WebM. Máx. 100MB. Se usar URL, não faça upload.</p>
+                        <p class="text-xs text-gray-500 mt-1">Formatos aceitos: MP4, WebM. Máx. 20MB. Se usar URL, não faça upload.</p>
                     </div>
                     <!-- Preview do vídeo -->
                     <div id="video-preview-container" class="mt-4"></div>
@@ -299,8 +299,8 @@
                     videoUrlInput.disabled = false;
                     return;
                 }
-                if (file.size > 100 * 1024 * 1024) {
-                    errorDiv.textContent = 'Arquivo muito grande. Máx. 100MB.';
+                if (file.size > 20 * 1024 * 1024) {
+                    errorDiv.textContent = 'Arquivo muito grande. Máx. 20MB.';
                     videoUploadInput.value = '';
                     videoUrlInput.disabled = false;
                     return;
