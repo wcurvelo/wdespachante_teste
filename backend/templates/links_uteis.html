@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Links Úteis - WDespachante{% endblock %}
+
+{% block meta_description %}Encontre links úteis e importantes para serviços do Detran, legislação e outras informações relevantes no Brasil, selecionados pela WDespachante.{% endblock %}
+
+{% block content %}
+<section class="bg-primary-dark text-white py-20">
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold font-heading">Links Úteis</h1>
+        <p class="text-lg text-blue-200 mt-4 max-w-3xl mx-auto">
+            Acesse os principais sites e informações para facilitar seus processos no Detran e outros órgãos.
+        </p>
+    </div>
+</section>
+
+<section class="bg-light py-20">
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% if links %}
+                {% for link in links %}
+                <div class="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col justify-between">
+                    <div class="flex items-center mb-4">
+                        {% if link.icon %}
+                            <div class="inline-block bg-primary-light text-white rounded-full p-3 mr-4">
+                                <i class="{{ link.icon }} text-2xl"></i>
+                            </div>
+                        {% endif %}
+                        <h3 class="text-xl font-bold font-heading text-dark">{{ link.title }}</h3>
+                    </div>
+                    <p class="text-gray-600 mb-4 flex-grow">{{ link.description }}</p>
+                    <a href="{{ link.url }}" target="_blank" class="font-semibold text-primary hover:text-secondary transition-colors flex items-center gap-2 mt-auto">
+                        Acessar Link <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-center col-span-full text-gray-500">Nenhum link útil disponível no momento.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %} 

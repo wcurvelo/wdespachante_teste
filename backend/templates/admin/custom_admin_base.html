@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Painel Administrativo{% endblock %} - Meu Blog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#1E3A8A', // Azul escuro
+                        'secondary': '#10B981', // Verde esmeralda
+                        'light': '#F3F4F6', // Cinza muito claro
+                        'dark': '#111827', // Cinza quase preto
+                        'dark-secondary': '#1F2937', // Cinza escuro para cards
+                        'dark-tertiary': '#374151', // Cinza para bordas/divisores
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* dark */
+            color: #F3F4F6; /* light */
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #374151; /* dark-tertiary */
+            border-radius: 20px;
+        }
+    </style>
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="flex h-screen">
+
+    <!-- Sidebar -->
+    <aside class="sidebar w-64 bg-dark-secondary flex-shrink-0 flex flex-col p-4 overflow-y-auto">
+        <div class="text-2xl font-bold font-heading text-white mb-8">MeuLogo</div>
+        <nav class="flex-grow">
+            <ul>
+                <li class="mb-4">
+                    <a href="{{ url_for('custom_dashboard') }}" class="flex items-center p-2 text-base font-normal text-gray-300 rounded-lg {% if request.endpoint == 'custom_dashboard' %}bg-primary{% else %}hover:bg-dark-tertiary{% endif %}">
+                        <i class="fas fa-tachometer-alt w-6 h-6"></i>
+                        <span class="ml-3">Dashboard</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="{{ url_for('custom_news_list') }}" class="flex items-center p-2 text-base font-normal text-gray-300 rounded-lg {% if 'custom_news' in request.endpoint %}bg-primary{% else %}hover:bg-dark-tertiary{% endif %}">
+                        <i class="fas fa-newspaper w-6 h-6"></i>
+                        <span class="ml-3">Notícias</span>
+                    </a>
+                </li>
+                 <li class="mb-2">
+                    <a href="{{ url_for('category.index_view') }}" class="flex items-center p-2 text-base font-normal text-gray-300 rounded-lg {% if request.endpoint == 'category.index_view' %}bg-primary{% else %}hover:bg-dark-tertiary{% endif %}">
+                        <i class="fas fa-tags w-6 h-6"></i>
+                        <span class="ml-3">Categorias</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="{{ url_for('comment.index_view') }}" class="flex items-center p-2 text-base font-normal text-gray-300 rounded-lg {% if request.endpoint == 'comment.index_view' %}bg-primary{% else %}hover:bg-dark-tertiary{% endif %}">
+                        <i class="fas fa-comments w-6 h-6"></i>
+                        <span class="ml-3">Comentários</span>
+                    </a>
+                </li>
+                <li class="mb-2">
+                    <a href="{{ url_for('user.index_view') }}" class="flex items-center p-2 text-base font-normal text-gray-300 rounded-lg {% if request.endpoint == 'user.index_view' %}bg-primary{% else %}hover:bg-dark-tertiary{% endif %}">
+                        <i class="fas fa-users w-6 h-6"></i>
+                        <span class="ml-3">Usuários</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="mt-auto border-t border-dark-tertiary pt-4">
+             <a href="{{ url_for('logout') }}" class="flex items-center p-2 text-base font-normal text-gray-300 rounded-lg hover:bg-dark-tertiary">
+                <i class="fas fa-sign-out-alt w-6 h-6"></i>
+                <span class="ml-3">Sair</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-y-auto">
+        
+        <!-- Top Bar -->
+        <header class="bg-dark-secondary shadow-md p-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold font-heading">
+                {% block page_title %}Dashboard{% endblock %}
+            </h1>
+            <div class="flex items-center">
+                <span class="mr-4">Olá, {{ current_user.username if current_user.is_authenticated else 'Visitante' }}</span>
+                <img src="{{ current_user.profile_image_url if current_user.is_authenticated else url_for('static', filename='images/placeholder_profile.jpg') }}" alt="Foto do Perfil" class="w-10 h-10 rounded-full">
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="p-6 lg:p-8 flex-grow">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html> 

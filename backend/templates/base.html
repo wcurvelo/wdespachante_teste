@@ -3,66 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Wellington Despachante{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}Soluções completas em serviços de Detran com agilidade e segurança.{% endblock %}">
+    <title>{% block title %}WDespachante{% endblock %} - Soluções em Documentação Veicular</title>
+    <meta name="description" content="{% block meta_description %}Soluções completas em serviços de Detran com a agilidade e segurança que você precisa. Conte com Wellington Curvelo.{% endblock %}">
     
-    <!-- TailwindCSS via CDN -->
+    <!-- TailwindCSS e Plugins -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.5.13/src/index.min.js"></script>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700&display=swap" rel="stylesheet">
 
     <!-- Remix Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script>
+        // Configuração do Tailwind para aplicar o tema do site de referência
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#1E40AF', // Azul mais escuro
+                            light: '#2563EB', // Azul um pouco mais claro
+                            dark: '#1E3A8A',   // Azul bem escuro
+                        },
+                        secondary: '#F97316', // Laranja
+                        light: '#F3F4F6',    // Cinza bem claro para fundos
+                        dark: '#111827',     // Cinza escuro
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     
     <style>
-        /* Adicionando a fonte Inter como padrão */
+        /* Estilos globais para a fonte e cores */
         body {
             font-family: 'Inter', sans-serif;
+            color: #374151; /* text-gray-700 */
+            background-color: #FFFFFF; /* bg-white */
         }
     </style>
+    
+    {% block head_extra %}{% endblock %}
 </head>
-<body class="bg-white text-gray-800">
+<body class="bg-white">
 
-    <header class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto max-w-7xl px-6">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-4">
-                <div class="text-2xl font-bold text-blue-800">
-                    <a href="{{ url_for('index') }}">WDespachante</a>
-                </div>
-                <nav class="hidden lg:flex items-center space-x-8 text-lg">
-                    <a href="{{ url_for('index') }}#_top" class="text-gray-600 hover:text-orange-500 transition-colors">Início</a>
-                    <a href="{{ url_for('index') }}#servicos" class="text-gray-600 hover:text-orange-500 transition-colors">Serviços</a>
-                    <a href="{{ url_for('index') }}#sobre" class="text-gray-600 hover:text-orange-500 transition-colors">Sobre</a>
-                    <a href="{{ url_for('blog') }}" class="text-gray-600 hover:text-orange-500 transition-colors">Blog</a>
-                    <a href="{{ url_for('index') }}#contato" class="bg-blue-800 text-white px-6 py-2 rounded-md hover:bg-orange-500 transition-colors">Contato</a>
+                <a href="{{ url_for('index') }}" class="text-3xl md:text-4xl font-heading font-bold text-gray-800 tracking-tight">
+                    WDespachante
+                </a>
+                <nav class="hidden lg:flex items-center space-x-8">
+                    <a href="{{ url_for('index') }}" class="px-3 py-2 font-medium text-gray-800 hover:text-primary transition-colors">Início</a>
+                    <a href="{{ url_for('services_list') }}" class="px-3 py-2 font-medium text-gray-800 hover:text-primary transition-colors">Serviços</a>
+                    <a href="{{ url_for('blog') }}" class="px-3 py-2 font-medium text-gray-800 hover:text-primary transition-colors">Blog</a>
+                    <a href="{{ url_for('links_uteis') }}" class="px-3 py-2 font-medium text-gray-800 hover:text-primary transition-colors">Links Úteis</a>
+                    <a href="{{ url_for('detrans_do_brasil') }}" class="px-3 py-2 font-medium text-gray-800 hover:text-primary transition-colors">Detrans do Brasil</a>
+                    <a href="{{ url_for('index') }}#contact" class="px-3 py-2 font-medium text-gray-800 hover:text-primary transition-colors">Contato</a>
+                    <a href="https://wa.me/5521964474147" target="_blank" class="bg-secondary hover:bg-orange-600 text-white font-bold py-2 px-5 rounded-lg transition-colors shadow-md">
+                        Fale Conosco
+                    </a>
                 </nav>
                 <div class="lg:hidden">
                     <button id="mobile-menu-button" class="text-gray-700 focus:outline-none">
-                        <i class="ri-menu-3-line text-3xl"></i>
+                        <i class="fas fa-bars text-3xl"></i>
                     </button>
                 </div>
             </div>
         </div>
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden lg:hidden bg-white py-4">
-            <a href="{{ url_for('index') }}#_top" class="block text-center text-lg py-2 text-gray-700 hover:bg-gray-100">Início</a>
-            <a href="{{ url_for('index') }}#servicos" class="block text-center text-lg py-2 text-gray-700 hover:bg-gray-100">Serviços</a>
-            <a href="{{ url_for('index') }}#sobre" class="block text-center text-lg py-2 text-gray-700 hover:bg-gray-100">Sobre</a>
-            <a href="{{ url_for('blog') }}" class="block text-center text-lg py-2 text-gray-700 hover:bg-gray-100">Blog</a>
-            <a href="{{ url_for('index') }}#contato" class="block text-center text-lg py-2 text-gray-700 hover:bg-gray-100">Contato</a>
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-gray-200">
+            <a href="{{ url_for('index') }}" class="block py-3 px-4 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">Início</a>
+            <a href="{{ url_for('services_list') }}" class="block py-3 px-4 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">Serviços</a>
+            <a href="{{ url_for('blog') }}" class="block py-3 px-4 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">Blog</a>
+            <a href="{{ url_for('links_uteis') }}" class="block py-3 px-4 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">Links Úteis</a>
+            <a href="{{ url_for('detrans_do_brasil') }}" class="block py-3 px-4 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">Detrans do Brasil</a>
+            <a href="{{ url_for('index') }}#contact" class="block py-3 px-4 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-primary">Contato</a>
+            <div class="p-4">
+                 <a href="https://wa.me/5521964474147" target="_blank" class="block w-full text-center bg-secondary hover:bg-orange-600 text-white font-bold py-3 px-5 rounded-lg transition-colors shadow-md">
+                    Fale Conosco
+                </a>
+            </div>
         </div>
     </header>
 
     <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <div class="container mx-auto max-w-7xl px-6 my-4">
+                <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-6">
                     {% for category, message in messages %}
-                        <div class="p-4 rounded-md {% if category == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
-                            {{ message }}
+                        <div class="p-4 rounded-md border {% if category == 'success' %}bg-green-50 border-green-200 text-green-800{% else %}bg-red-50 border-red-200 text-red-800{% endif %}">
+                            <div class="flex items-center">
+                                <i class="fas {{ 'fa-check-circle' if category == 'success' else 'fa-exclamation-triangle' }} text-xl mr-3"></i>
+                                <span>{{ message }}</span>
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
@@ -72,51 +115,7 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-blue-900 text-white">
-        <div class="container mx-auto max-w-7xl px-6 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Sobre -->
-                <div class="md:col-span-1">
-                    <h3 class="text-2xl font-bold mb-4">WDespachante</h3>
-                    <p class="text-blue-200">Soluções completas em serviços de Detran com a experiência e confiabilidade de Wellington Curvelo.</p>
-                </div>
-                <!-- Serviços -->
-                <div>
-                    <h4 class="text-lg font-bold mb-4">Serviços</h4>
-                    <ul class="space-y-2 text-blue-200">
-                        <li><a href="{{ url_for('index') }}#servicos" class="hover:text-white">Transferência</a></li>
-                        <li><a href="{{ url_for('index') }}#servicos" class="hover:text-white">Licenciamento Anual</a></li>
-                        <li><a href="{{ url_for('index') }}#servicos" class="hover:text-white">Baixa de Gravame</a></li>
-                        <li><a href="{{ url_for('index') }}#servicos" class="hover:text-white">Primeira Licença</a></li>
-                    </ul>
-                </div>
-                <!-- Links Úteis -->
-                 <div>
-                    <h4 class="text-lg font-bold mb-4">Links Úteis</h4>
-                    <ul class="text-blue-200 space-y-2">
-                        <li><a href="{{ url_for('index') }}">Início</a></li>
-                        <li><a href="{{ url_for('index') }}#sobre">Sobre Nós</a></li>
-                        <li><a href="{{ url_for('blog') }}">Blog</a></li>
-                        <li><a href="{{ url_for('index') }}#contato">Contato</a></li>
-                    </ul>
-                </div>
-                <!-- Contato -->
-                <div>
-                    <h4 class="text-lg font-bold mb-4">Contato</h4>
-                    <ul class="space-y-3 text-blue-200">
-                        <li class="flex items-start gap-3"><i class="ri-map-pin-2-line mt-1"></i><span>Av. Treze de Maio, 23 - Sala 1936, Centro, Rio de Janeiro - RJ</span></li>
-                        <li class="flex items-center gap-3"><i class="ri-phone-line"></i><span>(21) 2220-2679</span></li>
-                        <li class="flex items-center gap-3"><i class="ri-whatsapp-line"></i><span>(21) 96447-4147</span></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="bg-blue-800 py-4">
-            <div class="container mx-auto max-w-7xl px-6 text-center text-blue-200">
-                <p>&copy; {{ now.year }} WDespachante - Wellington Curvelo. Todos os direitos reservados.</p>
-            </div>
-        </div>
-    </footer>
+    {% include '_footer.html' %}
     
     <script>
     document.getElementById('mobile-menu-button').addEventListener('click', function() {
@@ -124,6 +123,8 @@
         menu.classList.toggle('hidden');
     });
     </script>
+    
     {% block custom_js %}{% endblock %}
+
 </body>
 </html> 

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Erro no Servidor{% endblock %}
+
+{% block content %}
+<div class="bg-light dark:bg-dark text-gray-800 dark:text-light py-20 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md mx-auto text-center">
+        <h1 class="text-6xl font-extrabold text-primary font-heading">500</h1>
+        <h2 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Erro Interno do Servidor.</h2>
+        <p class="mt-4 text-lg text-gray-600 dark:text-gray-400">
+            Ocorreu um erro inesperado no nosso lado. Nossa equipe já foi notificada e está trabalhando para resolver o problema.
+        </p>
+        <div class="mt-8">
+            <a href="{{ url_for('index') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors">
+                Voltar para a Página Inicial
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

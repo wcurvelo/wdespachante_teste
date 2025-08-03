@@ -1,193 +1,173 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    Blog
-    {% if category %} - Categoria: {{ category.name }}{% endif %}
-    {% if tag %} - Tag: {{ tag.name }}{% endif %}
-    - Wellington Despachante RJ
-{% endblock %}
+{% block title %}Nosso Blog - WDespachante{% endblock %}
 
-{% block body_class %}bg-gray-50{% endblock %}
+{% block meta_description %}Fique por dentro das últimas notícias, dicas e informações sobre o mundo automotivo e o Detran no blog da WDespachante.{% endblock %}
 
 {% block content %}
-<!-- Blog Header -->
-<header class="bg-gray-800 text-white py-16">
-    <div class="container mx-auto max-w-7xl px-6 text-center">
-        <h1 class="text-4xl md:text-5xl font-extrabold">Nosso Blog</h1>
-        <p class="text-lg text-gray-300 mt-4 max-w-2xl mx-auto">
-            {% if category %}
-                Artigos na categoria: <span class="font-bold text-orange-400">{{ category.name }}</span>
-            {% elif tag %}
-                Artigos com a tag: <span class="font-bold text-orange-400">{{ tag.name }}</span>
-            {% else %}
+<!-- Cabeçalho do Blog -->
+<section class="bg-primary-dark text-white py-20">
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold font-heading">Nosso Blog</h1>
+        <p class="text-lg text-blue-200 mt-4 max-w-2xl mx-auto">
                 Fique por dentro das últimas notícias, dicas e informações do mundo automotivo.
-            {% endif %}
         </p>
     </div>
-</header>
+</section>
 
-<div class="container mx-auto max-w-7xl px-6 py-12">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Conteúdo Principal do Blog -->
+<section class="py-20 bg-light">
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
-        <!-- Main Content -->
+            <!-- Coluna de Artigos -->
         <main class="lg:col-span-8">
-            <!-- Articles Grid -->
             <div class="space-y-12">
-                {% for article in articles %}
-                    <article class="bg-white rounded-lg shadow-md overflow-hidden flex flex-col md:flex-row group">
-                        {% if article.featured_image %}
-                        <div class="md:w-1/3 flex-shrink-0">
+                    {% if articles.items %}
+                        {% for article in articles.items %}
+                            <article class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+                                {% if article.featured_image_filename %}
+                                <a href="{{ url_for('news_detail', slug=article.slug) }}">
+                                    <img src="{{ url_for('static', filename='uploads/images/medium/' + article.featured_image_filename) }}" alt="{{ article.title }}" class="w-full h-64 object-cover">
+                                </a>
+                                {% else %}
                             <a href="{{ url_for('news_detail', slug=article.slug) }}">
-                                <img src="{{ url_for('static', filename='uploads/images/medium/' + article.featured_image) }}" 
-                                     alt="{{ article.title }}"
-                                     loading="lazy"
-                                     class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105">
-                            </a>
-                        </div>
-                        {% endif %}
-                        <div class="p-6 flex flex-col justify-between">
-                            <div>
-                                {% if article.category_rel %}
-                                <a href="{{ url_for('blog', category_slug=article.category_rel.slug) }}" class="text-sm font-semibold text-orange-500 hover:text-orange-600 uppercase">{{ article.category_rel.name }}</a>
+                                    <img src="{{ url_for('static', filename='images/placeholder_news.jpg') }}" alt="{{ article.title }}" class="w-full h-64 object-cover">
+                                </a>
                                 {% endif %}
-                                
-                                <h2 class="mt-2 text-2xl font-bold text-gray-800">
-                                    <a href="{{ url_for('news_detail', slug=article.slug) }}" class="hover:text-gray-600">{{ article.title }}</a>
+                                <div class="p-8">
+                                    <div class="mb-4">
+                                        {% if article.category_obj %}
+                                        <a href="#" class="inline-block bg-primary-light bg-opacity-10 text-primary text-xs font-semibold px-2.5 py-1 rounded-full uppercase">{{ article.category_obj.name }}</a>
+                                        {% endif %}
+                                    </div>
+                                    <h2 class="text-2xl font-bold font-heading text-dark mb-3">
+                                        <a href="{{ url_for('news_detail', slug=article.slug) }}" class="hover:text-primary transition-colors">{{ article.title }}</a>
                                 </h2>
-                                
-                                <p class="mt-4 text-gray-600">
-                                    {{ article.content|striptags|truncate(150) }}
-                                </p>
-                            </div>
-                            
-                            <div class="mt-6 flex items-center justify-between text-sm text-gray-500">
-                                <div class="flex items-center gap-2">
-                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                    <span>{{ article.publication_date.strftime('%d de %B de %Y') }}</span>
-                                </div>
-                                 <a href="{{ url_for('news_detail', slug=article.slug) }}" class="font-semibold text-orange-500 hover:text-orange-600">
-                                    Ler mais &rarr;
+                                    <p class="text-gray-600 mb-6">
+                                        {{ article.summary|striptags|truncate(180) if article.summary else article.content|striptags|truncate(180) }}
+                                    </p>
+                                    <div class="flex items-center justify-between text-sm text-gray-500">
+                                        <span class="flex items-center gap-2"><i class="fas fa-calendar-alt text-primary"></i>{{ article.publication_date.strftime('%d de %B de %Y') }}</span>
+                                        <a href="{{ url_for('news_detail', slug=article.slug) }}" class="font-semibold text-primary hover:text-secondary transition-colors flex items-center gap-2">
+                                            Leia mais <i class="fas fa-arrow-right"></i>
                                 </a>
                             </div>
                         </div>
                     </article>
+                        {% endfor %}
                 {% else %}
                     <div class="text-center py-16 px-6 bg-white rounded-lg shadow-md">
-                         <svg class="w-16 h-16 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
+                            <i class="fas fa-search text-6xl text-gray-300 mx-auto"></i>
                         <h3 class="mt-4 text-2xl font-bold text-gray-700">Nenhum artigo encontrado</h3>
-                        <p class="mt-2 text-gray-500">Não há artigos que correspondam aos seus critérios. Tente uma busca diferente.</p>
-                        <a href="{{ url_for('blog') }}" class="mt-6 inline-block bg-orange-500 text-white font-bold py-2 px-4 rounded hover:bg-orange-600">Voltar para o Blog</a>
+                            <p class="mt-2 text-gray-500">Não há artigos que correspondam aos seus critérios de busca.</p>
+                            <a href="{{ url_for('blog') }}" class="mt-6 inline-block bg-secondary text-white font-bold py-2 px-5 rounded-lg hover:bg-orange-600 transition-colors">Voltar para o Blog</a>
                     </div>
-                {% endfor %}
+                    {% endif %}
             </div>
 
-            <!-- Pagination -->
-            {% if pagination and pagination.pages > 1 %}
-            <nav class="mt-12 flex justify-between items-center" aria-label="Pagination">
-                {% if pagination.has_prev %}
-                    <a href="{{ url_for_page(pagination.prev_num) }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                        Anterior
-                    </a>
-                {% else %}
-                    <span class="relative inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-medium rounded-md text-gray-400 bg-gray-100 cursor-not-allowed">
-                        Anterior
-                    </span>
+                <!-- Paginação -->
+                {% if articles.pages > 1 %}
+                <nav class="mt-16 flex justify-center items-center space-x-2" aria-label="Pagination">
+                    {% if articles.has_prev %}
+                        <a href="{{ url_for('blog', page=articles.prev_num) }}" class="inline-flex items-center justify-center w-10 h-10 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-light transition-colors">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
                 {% endif %}
 
-                <div class="hidden md:block">
-                    {% for page in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
-                        {% if page %}
-                            {% if page != pagination.page %}
-                                <a href="{{ url_for_page(page) }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">{{ page }}</a>
-                            {% else %}
-                                <span aria-current="page" class="relative inline-flex items-center px-4 py-2 border border-orange-500 bg-orange-50 text-sm font-medium text-orange-600">
-                                    {{ page }}
-                                </span>
-                            {% endif %}
+                    {% for page_num in articles.iter_pages() %}
+                        {% if page_num %}
+                            <a href="{{ url_for('blog', page=page_num) }}" class="inline-flex items-center justify-center w-10 h-10 border rounded-md {% if articles.page == page_num %}bg-primary text-white border-primary{% else %}bg-white text-gray-700 border-gray-300 hover:bg-light{% endif %} transition-colors">
+                                {{ page_num }}
+                            </a>
                         {% else %}
-                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">...</span>
+                            <span class="inline-flex items-center justify-center w-10 h-10 text-gray-500">...</span>
                         {% endif %}
                     {% endfor %}
-                </div>
 
-                {% if pagination.has_next %}
-                     <a href="{{ url_for_page(pagination.next_num) }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                        Próxima
-                    </a>
-                {% else %}
-                    <span class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-200 text-sm font-medium rounded-md text-gray-400 bg-gray-100 cursor-not-allowed">
-                        Próxima
-                    </span>
+                    {% if articles.has_next %}
+                        <a href="{{ url_for('blog', page=articles.next_num) }}" class="inline-flex items-center justify-center w-10 h-10 border border-gray-300 rounded-md text-gray-700 bg-white hover:bg-light transition-colors">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
                 {% endif %}
             </nav>
             {% endif %}
         </main>
 
-        <!-- Sidebar -->
+            <!-- Barra Lateral -->
         <aside class="lg:col-span-4 space-y-8">
-            <!-- Search Widget -->
+                <!-- Busca -->
             <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Buscar</h3>
+                    <h3 class="text-xl font-bold font-heading text-dark mb-4">Buscar</h3>
                 <form action="{{ url_for('search') }}" method="GET" class="flex">
-                    <input type="text" name="q" placeholder="Buscar no blog..." value="{{ request.args.get('q', '') }}" class="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-orange-500">
-                    <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded-r-md hover:bg-orange-600">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <input type="text" name="q" placeholder="Buscar no blog..." class="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent">
+                        <button type="submit" class="bg-secondary text-white px-4 py-2 rounded-r-md hover:bg-orange-600 transition-colors">
+                            <i class="fas fa-search"></i>
                     </button>
                 </form>
             </div>
 
-            <!-- Categories Widget -->
+                <!-- Categorias -->
             <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Categorias</h3>
-                <ul class="space-y-2">
-                    {% for cat in categories %}
-                    <li>
-                        <a href="{{ url_for('blog', category_slug=cat.slug) }}" class="flex justify-between items-center text-gray-600 hover:text-orange-500 {% if category and category.id == cat.id %}text-orange-500 font-bold{% endif %}">
+                    <h3 class="text-xl font-bold font-heading text-dark mb-4">Categorias</h3>
+                    <ul class="space-y-3">
+                        {% if categories %}
+                            {% for cat in categories|sort(attribute='name') %}
+                            <li>
+                                <a href="{{ url_for('blog', category_slug=cat.slug) }}" class="flex justify-between items-center text-gray-700 hover:text-primary transition-colors">
                             <span>{{ cat.name }}</span>
-                            <span class="text-xs font-semibold bg-gray-200 text-gray-600 px-2 py-1 rounded-full">{{ cat.news_articles|length }}</span>
+                                    <span class="text-xs font-semibold bg-light text-gray-600 px-2 py-1 rounded-full">{{ cat.news_articles|length }}</span>
                         </a>
                     </li>
                     {% endfor %}
+                        {% else %}
+                            <p class="text-sm text-gray-500">Nenhuma categoria encontrada.</p>
+                        {% endif %}
                 </ul>
             </div>
 
-            <!-- Featured Articles Widget -->
-            {% if featured_articles %}
+                <!-- Artigos Recentes (usando as últimas 5 notícias) -->
             <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Artigos em Destaque</h3>
+                    <h3 class="text-xl font-bold font-heading text-dark mb-4">Artigos Recentes</h3>
                 <ul class="space-y-4">
-                    {% for article in featured_articles %}
+                        {% if recent_news %}
+                            {% for recent_article in recent_news %}
                     <li class="flex items-center gap-4">
-                        <a href="{{ url_for('news_detail', slug=article.slug) }}" class="flex-shrink-0">
-                            <img src="{{ url_for('static', filename='uploads/images/thumb/' + article.featured_image) if article.featured_image else url_for('static', filename='images/placeholder_thumb.jpg') }}" alt="{{ article.title }}" class="w-16 h-16 rounded-md object-cover">
+                                <a href="{{ url_for('news_detail', slug=recent_article.slug) }}" class="flex-shrink-0">
+                                    <img src="{{ url_for('static', filename='uploads/images/thumb/' + recent_article.featured_image_filename) if recent_article.featured_image_filename else url_for('static', filename='images/placeholder_profile.jpg') }}" alt="{{ recent_article.title }}" class="w-16 h-16 rounded-md object-cover">
                         </a>
                         <div>
-                            <h4 class="font-semibold text-gray-800 leading-tight">
-                                <a href="{{ url_for('news_detail', slug=article.slug) }}" class="hover:text-orange-500">{{ article.title }}</a>
+                                    <h4 class="font-semibold text-dark leading-tight">
+                                        <a href="{{ url_for('news_detail', slug=recent_article.slug) }}" class="hover:text-primary transition-colors">{{ recent_article.title }}</a>
                             </h4>
-                             <p class="text-xs text-gray-500 mt-1">{{ article.publication_date.strftime('%d/%m/%Y') }}</p>
+                                    <p class="text-xs text-gray-500 mt-1">{{ recent_article.publication_date.strftime('%d/%m/%Y') }}</p>
                         </div>
                     </li>
                     {% endfor %}
+                        {% else %}
+                            <p class="text-sm text-gray-500">Nenhum artigo recente encontrado.</p>
+                        {% endif %}
                 </ul>
             </div>
-            {% endif %}
 
-            <!-- Tags Widget -->
-            {% if tags %}
+                <!-- Tags -->
             <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">Tags</h3>
+                    <h3 class="text-xl font-bold font-heading text-dark mb-4">Tags</h3>
                 <div class="flex flex-wrap gap-2">
-                    {% for t in tags %}
-                    <a href="{{ url_for('blog', tag_slug=t.slug) }}" class="text-sm bg-gray-200 text-gray-700 px-3 py-1 rounded-full hover:bg-orange-500 hover:text-white transition-colors {% if tag and tag.id == t.id %}bg-orange-500 text-white{% endif %}">
-                        {{ t.name }}
+                        {% if tags %}
+                            {% for tag in tags|sort(attribute='name') %}
+                            <a href="{{ url_for('blog', tag_slug=tag.slug) }}" class="text-sm bg-light text-gray-700 px-3 py-1 rounded-full hover:bg-secondary hover:text-white transition-colors">
+                                {{ tag.name }}
                     </a>
                     {% endfor %}
+                        {% else %}
+                            <p class="text-sm text-gray-500">Nenhuma tag encontrada.</p>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-            {% endif %}
 
         </aside>
     </div>
 </div>
+</section>
 {% endblock %} 

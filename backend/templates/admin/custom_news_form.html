@@ -1,0 +1,390 @@
+{% extends 'admin/custom_admin_base.html' %}
+
+{% set page_title = "Editar Notícia" if news else "Criar Nova Notícia" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block page_title %}
+    <div class="flex justify-between items-center w-full">
+        <span>{{ page_title }}</span>
+        <div>
+            <a href="{{ url_for('custom_dashboard') }}" class="bg-dark-tertiary hover:bg-gray-600 text-white font-bold py-2 px-4 rounded inline-flex items-center transition-colors duration-200">
+                <i class="fas fa-arrow-left mr-2"></i>
+                <span>Voltar</span>
+            </a>
+            <button type="submit" form="news-form" class="bg-primary hover:bg-blue-800 text-white font-bold py-2 px-4 rounded inline-flex items-center transition-colors duration-200">
+                <i class="fas fa-save mr-2"></i>
+                <span>Salvar Alterações</span>
+            </button>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+<form id="news-form" method="POST" enctype="multipart/form-data">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Coluna Principal -->
+        <div class="lg:col-span-2 space-y-8">
+            
+            <!-- Card de Informações Básicas -->
+            <div class="bg-dark-secondary p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-bold mb-4 border-b border-dark-tertiary pb-3">Informações Básicas</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-300 mb-1">Título da Notícia</label>
+                        <input type="text" id="title" name="title" class="w-full bg-dark-tertiary border border-gray-600 rounded-md p-2 text-white focus:ring-primary focus:border-primary" placeholder="Digite o título aqui" value="{{ news.title if news else '' }}">
+                    </div>
+                    <div>
+                        <label for="summary" class="block text-sm font-medium text-gray-300 mb-1">Resumo</label>
+                        <textarea id="summary" name="summary" rows="3" class="w-full bg-dark-tertiary border border-gray-600 rounded-md p-2 text-white focus:ring-primary focus:border-primary" placeholder="Um resumo curto para exibição em listas.">{{ news.summary if news else '' }}</textarea>
+                    </div>
+                    <div>
+                        <label for="content" class="block text-sm font-medium text-gray-300 mb-1">Conteúdo Completo</label>
+                        <textarea id="content" name="content" rows="15" class="w-full bg-dark-tertiary border border-gray-600 rounded-md p-2 text-white" placeholder="Escreva o corpo da notícia aqui...">{{ news.content if news else '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Mídia -->
+            <div class="bg-dark-secondary p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-bold mb-4 border-b border-dark-tertiary pb-3">Mídia</h3>
+                <div>
+                    <!-- Imagem Destacada -->
+                    <div class="mb-4">
+                        <label for="featured_image" class="block text-sm font-medium text-gray-300 mb-1">Imagem Destacada</label>
+                        {% if news and news.featured_image %}
+                            <div class="my-2">
+                                <img src="{{ url_for('static', filename='uploads/images/thumb/' + news.featured_image) }}" alt="Imagem atual" class="h-24 w-auto rounded-md">
+                                <p class="text-xs text-gray-400 mt-1">Imagem atual. Envie uma nova para substituir.</p>
+                            </div>
+                        {% endif %}
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <i class="fas fa-image fa-2x text-gray-500"></i>
+                                <div class="flex text-sm text-gray-400">
+                                    <label for="featured_image_upload" class="relative cursor-pointer bg-dark-tertiary rounded-md font-medium text-primary hover:text-blue-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-dark-secondary focus-within:ring-primary">
+                                        <span>Carregar um arquivo</span>
+                                        <input id="featured_image_upload" name="featured_image" type="file" class="sr-only">
+                                    </label>
+                                    <p class="pl-1">ou arraste e solte</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, WEBP até 10MB</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Vídeo: URL ou Upload -->
+                    <div class="mb-4">
+                        <label for="video_url" class="block text-sm font-medium text-gray-300 mb-1">URL do Vídeo (YouTube ou Vimeo)</label>
+                        <input type="url" id="video_url" name="video_url" class="w-full bg-dark-tertiary border border-gray-600 rounded-md p-2 text-white focus:ring-primary focus:border-primary" placeholder="https://www.youtube.com/watch?v=... ou https://vimeo.com/..." value="{{ news.video_url if news else '' }}">
+                        <p class="text-xs text-gray-500 mt-1">Cole o link do YouTube ou Vimeo para incorporar. Se usar upload, deixe em branco.</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="video_upload" class="block text-sm font-medium text-gray-300 mb-1">Upload de Vídeo</label>
+                        <input type="file" id="video_upload" name="video_upload" accept="video/mp4,video/webm" class="w-full bg-dark-tertiary border border-gray-600 rounded-md p-2 text-white">
+                        <p class="text-xs text-gray-500 mt-1">Formatos aceitos: MP4, WebM. Máx. 100MB. Se usar URL, não faça upload.</p>
+                    </div>
+                    <!-- Preview do vídeo -->
+                    <div id="video-preview-container" class="mt-4"></div>
+                    <div id="video-error" class="text-red-500 text-sm mt-2"></div>
+
+                    <!-- Galeria de Imagens -->
+                    <div class="mb-4">
+                        <label for="gallery_images" class="block text-sm font-medium text-gray-300 mb-1">Galeria de Imagens</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-600 border-dashed rounded-md">
+                            <div class="space-y-1 text-center">
+                                <i class="fas fa-images fa-2x text-gray-500"></i>
+                                <div class="flex text-sm text-gray-400">
+                                    <label for="gallery_images_upload" class="relative cursor-pointer bg-dark-tertiary rounded-md font-medium text-primary hover:text-blue-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-dark-secondary focus-within:ring-primary">
+                                        <span>Carregar vários arquivos</span>
+                                        <input id="gallery_images_upload" name="gallery_images" type="file" multiple class="sr-only" accept="image/*">
+                                    </label>
+                                    <p class="pl-1">ou arraste e solte</p>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, WEBP, GIF</p>
+                            </div>
+                        </div>
+                        <!-- Área de pré-visualização e gerenciamento da galeria -->
+                        <div id="gallery-preview-container" class="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            {% if gallery_images %}
+                                {% for img in gallery_images %}
+                                    <div class="relative group">
+                                        <img src="{{ url_for('static', filename='uploads/images/gallery/' + img) }}" alt="Galeria Imagem" class="w-full h-32 object-cover rounded-md">
+                                        <button type="button" class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity delete-gallery-image" data-filename="{{ img }}">
+                                            <i class="fas fa-times text-xs"></i>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <input type="hidden" id="deleted_gallery_images" name="deleted_gallery_images" value="[]">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Compartilhamento em Redes Sociais -->
+            <div class="bg-dark-secondary p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-bold mb-4 border-b border-dark-tertiary pb-3">Compartilhamento em Redes Sociais</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="social_share_title" class="block text-sm font-medium text-gray-300 mb-1">Título para Redes Sociais</label>
+                        <input type="text" id="social_share_title" name="social_share_title" class="w-full bg-dark-tertiary border border-gray-600 rounded-md p-2 text-white focus:ring-primary focus:border-primary" placeholder="Título otimizado para compartilhamento" value="{{ news.social_share_title if news else '' }}">
+                        <p class="text-xs text-gray-500 mt-1">Se deixar em branco, usa o título principal da notícia.</p>
+                    </div>
+                    <div>
+                        <label for="social_share_description" class="block text-sm font-medium text-gray-300 mb-1">Descrição para Redes Sociais</label>
+                        <textarea id="social_share_description" name="social_share_description" rows="3" class="w-full bg-dark-tertiary border border-gray-600 rounded-md p-2 text-white focus:ring-primary focus:border-primary" placeholder="Descrição otimizada para compartilhamento.">{{ news.social_share_description if news else '' }}</textarea>
+                        <p class="text-xs text-gray-500 mt-1">Se deixar em branco, usa o resumo ou meta descrição da página.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Coluna Lateral -->
+        <div class="lg:col-span-1 space-y-8">
+            
+            <!-- Card de Publicação -->
+            <div class="bg-dark-secondary p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-bold mb-4 border-b border-dark-tertiary pb-3">Publicação</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-300 mb-1">Status</label>
+                        <select id="status" name="status" class="w-full bg-dark-tertiary border border-gray-600 rounded-md p-2 text-white focus:ring-primary focus:border-primary">
+                            <option value="published" {% if news and news.status == 'published' %}selected{% endif %}>Publicado</option>
+                            <option value="draft" {% if (news and news.status == 'draft') or not news %}selected{% endif %}>Rascunho</option>
+                            <option value="scheduled" {% if news and news.status == 'scheduled' %}selected{% endif %}>Agendado</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label for="pub_date" class="block text-sm font-medium text-gray-300 mb-1">Data de Publicação</label>
+                        <input type="datetime-local" id="pub_date" name="pub_date" class="w-full bg-dark-tertiary border border-gray-600 rounded-md p-2 text-white focus:ring-primary focus:border-primary" value="{{ news.publication_date.strftime('%Y-%m-%dT%H:%M') if news and news.publication_date else pub_date_now }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card de Categorias -->
+            <div class="bg-dark-secondary p-6 rounded-lg shadow-lg">
+                 <h3 class="text-lg font-bold mb-4 border-b border-dark-tertiary pb-3">Categorias</h3>
+                 <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {% if categories %}
+                        {% for category in categories %}
+                        <div class="flex items-center">
+                            <input id="cat-{{ category.id }}" name="category" value="{{ category.id }}" type="radio" class="h-4 w-4 text-primary bg-dark-tertiary border-gray-500 focus:ring-primary" {% if news and news.category_id == category.id %}checked{% endif %}>
+                            <label for="cat-{{ category.id }}" class="ml-3 block text-sm font-medium text-gray-300">{{ category.name }}</label>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-sm text-gray-500">Nenhuma categoria encontrada. Crie uma na seção de Categorias.</p>
+                    {% endif %}
+                 </div>
+            </div>
+
+            <!-- Card de Tags -->
+            <div class="bg-dark-secondary p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-bold mb-4 border-b border-dark-tertiary pb-3">Tags</h3>
+                <div>
+                    <input type="text" name="tags" class="w-full bg-dark-tertiary border border-gray-600 rounded-md p-2 text-white" placeholder="Adicione tags separadas por vírgula" value="{{ news.tags | join(', ') if news and news.tags else '' }}">
+                    <p class="text-xs text-gray-500 mt-1">Ex: inovação, mercado, software</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.tiny.cloud/1/sjxzi8hgaefeg3rojd1y02osd0ebtfa9p1r5appzfui4zum3/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // TinyMCE
+        tinymce.init({
+            selector: 'textarea#content',
+            plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
+            menubar: 'file edit view insert format tools table help',
+            toolbar: 'undo redo | bold italic underline strikethrough | fontfamily fontsize blocks | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | pagebreak | charmap emoticons | fullscreen  preview save print | insertfile image media template link anchor codesample | ltr rtl',
+            skin: 'oxide-dark',
+            content_css: 'dark',
+            content_style: "body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'; font-size: 14pt; color: #E5E7EB; }",
+            height: 600,
+            autosave_ask_before_unload: true,
+            autosave_interval: '30s',
+            autosave_prefix: '{path}{query}-{id}-',
+            autosave_restore_when_empty: false,
+            autosave_retention: '2m',
+            image_advtab: true,
+            importcss_append: true,
+            template_cdate_format: '[Date Created (CDATE): %m/%d/%Y : %H:%M:%S]',
+            template_mdate_format: '[Date Modified (MDATE): %m/%d/%Y : %H:%M:%S]',
+            image_caption: true,
+            quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
+            noneditable_class: 'mceNonEditable',
+            toolbar_mode: 'sliding',
+            contextmenu: 'link image table',
+        });
+
+        // --- Vídeo: Preview, Limite, Exclusividade ---
+        const videoUrlInput = document.getElementById('video_url');
+        const videoUploadInput = document.getElementById('video_upload');
+        const previewContainer = document.getElementById('video-preview-container');
+        const errorDiv = document.getElementById('video-error');
+
+        function clearPreview() {
+            previewContainer.innerHTML = '';
+            errorDiv.textContent = '';
+        }
+
+        function showVideoPreview(src, isEmbed=false) {
+            clearPreview();
+            if (isEmbed) {
+                previewContainer.innerHTML = `<div class='aspect-w-16 aspect-h-9'><iframe src='${src}' frameborder='0' allowfullscreen class='w-full h-64 rounded'></iframe></div>`;
+            } else {
+                previewContainer.innerHTML = `<video controls class='w-full max-w-md rounded'><source src='${src}'></video>`;
+            }
+        }
+
+        // --- Preview para URL ---
+        videoUrlInput.addEventListener('input', function() {
+            const url = videoUrlInput.value.trim();
+            clearPreview();
+            if (url) {
+                // Bloqueia upload
+                videoUploadInput.value = '';
+                videoUploadInput.disabled = true;
+                // Detecta YouTube ou Vimeo
+                let embedUrl = '';
+                if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    // Extrai ID do vídeo
+                    let videoId = '';
+                    if (url.includes('v=')) {
+                        videoId = url.split('v=')[1].split('&')[0];
+                    } else if (url.includes('youtu.be/')) {
+                        videoId = url.split('youtu.be/')[1].split('?')[0];
+                    }
+                    if (videoId) {
+                        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                    }
+                } else if (url.includes('vimeo.com')) {
+                    // Extrai ID do Vimeo
+                    const match = url.match(/vimeo.com\/(\d+)/);
+                    if (match) {
+                        embedUrl = `https://player.vimeo.com/video/${match[1]}`;
+                    }
+                }
+                if (embedUrl) {
+                    showVideoPreview(embedUrl, true);
+                } else {
+                    errorDiv.textContent = 'URL inválida para YouTube ou Vimeo.';
+                }
+            } else {
+                videoUploadInput.disabled = false;
+                clearPreview();
+            }
+        });
+
+        // --- Preview para Upload ---
+        videoUploadInput.addEventListener('change', function() {
+            clearPreview();
+            const file = videoUploadInput.files[0];
+            if (file) {
+                // Bloqueia URL
+                videoUrlInput.value = '';
+                videoUrlInput.disabled = true;
+                // Validação de tipo e tamanho
+                const validTypes = ['video/mp4', 'video/webm'];
+                if (!validTypes.includes(file.type)) {
+                    errorDiv.textContent = 'Formato inválido. Só MP4 ou WebM.';
+                    videoUploadInput.value = '';
+                    videoUrlInput.disabled = false;
+                    return;
+                }
+                if (file.size > 100 * 1024 * 1024) {
+                    errorDiv.textContent = 'Arquivo muito grande. Máx. 100MB.';
+                    videoUploadInput.value = '';
+                    videoUrlInput.disabled = false;
+                    return;
+                }
+                // Preview
+                const url = URL.createObjectURL(file);
+                showVideoPreview(url);
+            } else {
+                videoUrlInput.disabled = false;
+                clearPreview();
+            }
+        });
+
+        // --- Galeria de Imagens ---
+        const galleryUploadInput = document.getElementById('gallery_images_upload');
+        const galleryPreviewContainer = document.getElementById('gallery-preview-container');
+        const deletedGalleryImagesInput = document.getElementById('deleted_gallery_images');
+        let deletedGalleryImages = JSON.parse(deletedGalleryImagesInput.value);
+
+        function addImageToGalleryPreview(fileOrSrc, filename = null) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const div = document.createElement('div');
+                div.className = 'relative group';
+                div.innerHTML = `
+                    <img src="${e.target.result}" alt="Pré-visualização da Imagem" class="w-full h-32 object-cover rounded-md">
+                    <button type="button" class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity delete-gallery-image" data-filename="${filename || e.target.result}">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                `;
+                galleryPreviewContainer.appendChild(div);
+            };
+            if (typeof fileOrSrc === 'string') { // Existing image from URL
+                // For existing images, create the element directly
+                const div = document.createElement('div');
+                div.className = 'relative group';
+                div.innerHTML = `
+                    <img src="${fileOrSrc}" alt="Pré-visualização da Imagem" class="w-full h-32 object-cover rounded-md">
+                    <button type="button" class="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity delete-gallery-image" data-filename="${filename}">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                `;
+                galleryPreviewContainer.appendChild(div);
+            } else { // New file upload
+                reader.readAsDataURL(fileOrSrc);
+            }
+        }
+
+        // Adicionar imagens novas ao preview
+        galleryUploadInput.addEventListener('change', function() {
+            for (const file of this.files) {
+                addImageToGalleryPreview(file);
+            }
+        });
+
+        // Lógica de exclusão para imagens da galeria (tanto novas quanto existentes)
+        galleryPreviewContainer.addEventListener('click', function(event) {
+            if (event.target.closest('.delete-gallery-image')) {
+                const button = event.target.closest('.delete-gallery-image');
+                const filenameToDelete = button.dataset.filename;
+                
+                // Se a imagem tiver um filename (ou seja, é uma imagem existente do banco de dados)
+                if (filenameToDelete.startsWith('uploads/images/gallery/')) {
+                    const actualFilename = filenameToDelete.split('/').pop();
+                    if (!deletedGalleryImages.includes(actualFilename)) {
+                        deletedGalleryImages.push(actualFilename);
+                    }
+                } else { // Se for uma imagem recém-selecionada para upload (sem filename ainda)
+                    // Encontrar o arquivo correspondente no FileList e removê-lo (complexo, geralmente não feito diretamente assim)
+                    // Por simplicidade aqui, apenas removemos do DOM. O backend não a salvará se ela não estiver mais no input.
+                }
+                
+                deletedGalleryImagesInput.value = JSON.stringify(deletedGalleryImages);
+                button.closest('.group').remove(); // Remove o elemento do DOM
+            }
+        });
+
+        // Exibir previews de imagens existentes ao carregar a página
+        {% if gallery_images %}
+            {% for img in gallery_images %}
+                addImageToGalleryPreview("{{ url_for('static', filename='uploads/images/gallery/' + img) }}", "{{ img }}");
+            {% endfor %}
+        {% endif %}
+
+    });
+</script>
+{% endblock %} 

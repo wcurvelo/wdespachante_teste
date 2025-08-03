@@ -50,7 +50,7 @@ class Category(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     
     # Relacionamentos
-    news_articles = db.relationship('News', backref='category_rel', lazy=True)
+    news_articles = db.relationship('News', back_populates='news_category', lazy=True)
     subcategories = db.relationship('Category', backref=db.backref('parent', remote_side=[id]), lazy=True)
     
     def __init__(self, *args, **kwargs):
@@ -77,7 +77,7 @@ class Tag(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.now)
     
     # Relacionamentos através da tabela de associação news_tags
-    news_articles = db.relationship('News', secondary=news_tags, lazy='subquery', backref=db.backref('tags_rel', lazy=True))
+    news_articles = db.relationship('News', secondary=news_tags, lazy=True, back_populates='tags', overlaps="news_articles_from_tag,news_tags_relation") # Adicionado overlaps
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -99,33 +99,31 @@ class Tag(db.Model):
 class News(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
+    slug = db.Column(db.String(200), unique=True, nullable=False) # Adicionado de volta: campo para URL amigável
     content = db.Column(db.Text, nullable=False)
     author = db.Column(db.String(100), nullable=False) # Nome do autor (para compatibilidade)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True) # Relacionamento com o usuário autor
-    publication_date = db.Column(db.DateTime, default=datetime.now)
-    publish_date = db.Column(db.DateTime, default=datetime.now)  # Alias para compatibilidade
-    category = db.Column(db.String(100), nullable=True) # Categoria como string (para compatibilidade)
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True) # Relacionamento com a categoria
-    tags = db.Column(db.String(255), nullable=True) # Tags como string (para compatibilidade)
-    slug = db.Column(db.String(255), unique=True, nullable=False)
-    meta_description = db.Column(db.String(160), nullable=True)
-    summary = db.Column(db.Text, nullable=True)  # Resumo do artigo
-    featured_image = db.Column(db.String(255), nullable=True) # URL ou caminho do arquivo
-    gallery_images = db.Column(db.Text, nullable=True) # Lista de imagens separadas por vírgula
-    video_filename = db.Column(db.String(255), nullable=True) # Caminho para vídeo de upload direto
-    video_embed_url = db.Column(db.String(255), nullable=True) # URL para vídeo embedado (YouTube, Vimeo)
-    video_url = db.Column(db.String(255), nullable=True) # URL para vídeo (YouTube, Vimeo)
-    video = db.Column(db.String(255), nullable=True)  # Alias para compatibilidade
-    video_embed = db.Column(db.String(255), nullable=True)  # Alias para compatibilidade
-    status = db.Column(db.String(50), default='draft') # draft, published, scheduled
-    sources = db.Column(db.Text, nullable=True) # Armazenar como JSON string ou texto
-    is_featured = db.Column(db.Boolean, default=False) # Destaque na página inicial
-    allow_comments = db.Column(db.Boolean, default=True) # Permitir comentários
-    social_title = db.Column(db.String(200), nullable=True) # Título para redes sociais
-    social_description = db.Column(db.Text, nullable=True) # Descrição para redes sociais
+    publication_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    status = db.Column(db.String(20), default='draft') # 'draft', 'published', 'scheduled'
+    is_featured = db.Column(db.Boolean, default=False)
+    allow_comments = db.Column(db.Boolean, default=True)
+    meta_description = db.Column(db.Text, nullable=True) # Adicionado: Campo para meta descrição SEO
+    summary = db.Column(db.Text, nullable=True) # Adicionado: Campo para um resumo curto da notícia
+
+    # Novos campos para mídia e compartilhamento
+    featured_image_filename = db.Column(db.String(255), nullable=True)
+    gallery_image_filenames = db.Column(db.Text, nullable=True) # Armazenar como JSON string de lista de filenames
+    video_filename = db.Column(db.String(255), nullable=True)
+    youtube_url = db.Column(db.String(255), nullable=True)
+    social_share_title = db.Column(db.String(255), nullable=True)
+    social_share_description = db.Column(db.Text, nullable=True)
+    
     comments = db.relationship('Comment', backref='news_article', lazy=True, 
-                              foreign_keys='Comment.news_article_id', cascade="all, delete-orphan")
+                               foreign_keys='Comment.news_article_id', cascade="all, delete-orphan")
     images = db.relationship('NewsImage', backref='news', lazy=True, cascade="all, delete-orphan")
+    tags = db.relationship('Tag', secondary=news_tags, back_populates='news_articles', overlaps="news_articles_from_tag,news_tags_relation") # Adicionado overlaps
+    news_category = db.relationship('Category', back_populates='news_articles', lazy=True, foreign_keys=[category_id])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -201,6 +199,7 @@ class Service(db.Model):
     icon = db.Column(db.String(100), nullable=True)
     summary = db.Column(db.Text, nullable=False)
     content = db.Column(db.Text, nullable=True)
+    price = db.Column(db.Float, nullable=True) # Adicionado o campo de preço
     active = db.Column(db.Boolean, default=True)
     featured = db.Column(db.Boolean, default=False)
     order = db.Column(db.Integer, default=0)

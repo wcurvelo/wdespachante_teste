@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Painel Administrativo{% endblock %} - WDespachante</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     {% block head_extra %}{% endblock %}
 </head>
@@ -17,18 +16,18 @@
                 <ul class="space-y-2">
                     <li>
                         <a href="{{ url_for('admin.index') }}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">
-                            <i class="ri-dashboard-line text-xl text-gray-500"></i>
+                            <i class="fas fa-tachometer-alt text-xl text-gray-500"></i>
                             <span class="ml-3">Dashboard</span>
                         </a>
                     </li>
                     <li>
                         <button type="button" class="flex items-center w-full p-2 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100" aria-controls="dropdown-content" data-collapse-toggle="dropdown-content">
-                            <i class="ri-newspaper-line text-xl text-gray-500"></i>
+                            <i class="fas fa-newspaper text-xl text-gray-500"></i>
                             <span class="flex-1 ml-3 text-left whitespace-nowrap">Conteúdo</span>
-                            <i class="ri-arrow-down-s-line"></i>
+                            <i class="fas fa-chevron-down"></i>
                         </button>
                         <ul id="dropdown-content" class="hidden py-2 space-y-2">
-                            <li><a href="{{ url_for('newsadminview.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Notícias</a></li>
+                            <li><a href="{{ url_for('news.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Notícias</a></li>
                             <li><a href="{{ url_for('category.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Categorias</a></li>
                             <li><a href="{{ url_for('tag.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Tags</a></li>
                             <li><a href="{{ url_for('comment.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Comentários</a></li>
@@ -36,22 +35,22 @@
                     </li>
                      <li>
                         <button type="button" class="flex items-center w-full p-2 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100" aria-controls="dropdown-site" data-collapse-toggle="dropdown-site">
-                            <i class="ri-global-line text-xl text-gray-500"></i>
+                            <i class="fas fa-globe text-xl text-gray-500"></i>
                             <span class="flex-1 ml-3 text-left whitespace-nowrap">Site</span>
-                            <i class="ri-arrow-down-s-line"></i>
+                            <i class="fas fa-chevron-down"></i>
                         </button>
                         <ul id="dropdown-site" class="hidden py-2 space-y-2">
-                            <li><a href="{{ url_for('serviceadminview.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Serviços</a></li>
-                            <li><a href="{{ url_for('testimonialadminview.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Depoimentos</a></li>
-                            <li><a href="{{ url_for('faqadminview.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">FAQs</a></li>
-                            <li><a href="{{ url_for('linkutiladminview.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Links Úteis</a></li>
-                            <li><a href="{{ url_for('detranadminview.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Detrans</a></li>
+                            <li><a href="{{ url_for('service.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Serviços</a></li>
+                            <li><a href="{{ url_for('testimonial.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Depoimentos</a></li>
+                            <li><a href="{{ url_for('faq.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">FAQs</a></li>
+                            <li><a href="{{ url_for('linkutil.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Links Úteis</a></li>
+                            <li><a href="{{ url_for('detran.index_view') }}" class="flex items-center w-full p-2 pl-11 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">Detrans</a></li>
                         </ul>
                     </li>
                     {% if current_user.is_admin %}
                     <li>
-                        <a href="{{ url_for('useradminview.index_view') }}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">
-                            <i class="ri-user-settings-line text-xl text-gray-500"></i>
+                        <a href="{{ url_for('user.index_view') }}" class="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg hover:bg-gray-100">
+                            <i class="fas fa-users-cog text-xl text-gray-500"></i>
                             <span class="ml-3">Usuários</span>
                         </a>
                     </li>

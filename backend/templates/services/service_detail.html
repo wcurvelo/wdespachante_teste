@@ -2,65 +2,73 @@
 
 {% block title %}{{ service.name }} - WDespachante{% endblock %}
 
-{% block content %}
-<div class="bg-white py-12">
-    <div class="container mx-auto max-w-5xl px-6">
-        
-        <!-- Breadcrumbs -->
-        <nav class="text-sm mb-8" aria-label="Breadcrumb">
-            <ol class="list-none p-0 inline-flex">
-                <li class="flex items-center">
-                    <a href="{{ url_for('home_new') }}" class="text-gray-500 hover:text-blue-600">Início</a>
-                    <i class="ri-arrow-right-s-line mx-2"></i>
-                </li>
-                <li class="flex items-center">
-                    <a href="{{ url_for('services_list') }}" class="text-gray-500 hover:text-blue-600">Serviços</a>
-                    <i class="ri-arrow-right-s-line mx-2"></i>
-                </li>
-                <li class="flex items-center">
-                    <span class="text-gray-800 font-semibold">{{ service.name }}</span>
-                </li>
-            </ol>
-        </nav>
+{% block meta_description %}{{ service.summary }}{% endblock %}
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <!-- Coluna Principal com Conteúdo -->
-            <div class="md:col-span-2">
-                <h1 class="text-4xl font-bold text-gray-800 mb-4">{{ service.name }}</h1>
-                <div class="prose max-w-none text-gray-700 leading-relaxed">
-                    {{ service.content|safe }}
-                </div>
-            </div>
-            
+{% block content %}
+<div class="bg-light py-20">
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+
+            <!-- Coluna Principal do Conteúdo -->
+            <main class="lg:col-span-8">
+                <article class="bg-white rounded-lg shadow-md p-8">
+                    <header class="mb-8">
+                        <h1 class="text-3xl md:text-4xl font-extrabold font-heading text-dark leading-tight">{{ service.name }}</h1>
+                        {% if service.icon %}
+                        <div class="inline-block bg-primary-light text-primary rounded-full p-3 mt-4">
+                            <i class="{{ service.icon }} text-xl"></i>
+                        </div>
+                        {% endif %}
+                    </header>
+                    
+                    <!-- Corpo do Conteúdo -->
+                    <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed">
+                        {{ service.content|safe }}
+                    </div>
+
+                    {% if service.price %}
+                    <div class="mt-8 p-4 bg-blue-50 border-l-4 border-blue-400 text-blue-800 rounded">
+                        <p class="font-bold">Valor estimado: R$ {{ "%.2f"|format(service.price) }}</p>
+                        <p class="text-sm">Este é um valor aproximado. Entre em contato para um orçamento detalhado.</p>
+                    </div>
+                    {% endif %}
+
+                </article>
+            </main>
+
             <!-- Barra Lateral -->
-            <aside>
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm border border-gray-200">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Outros Serviços</h3>
-                    <ul>
-                        {% for other_service in related_services %}
-                        <li class="mb-3">
-                            <a href="{{ url_for('service_detail', slug=other_service.slug) }}" class="flex items-center text-gray-700 hover:text-blue-600">
-                                <i class="ri-arrow-right-s-fill mr-2 text-blue-600"></i>
-                                <span>{{ other_service.name }}</span>
+            <aside class="lg:col-span-4 space-y-8">
+                <!-- Outros Serviços -->
+                {% if related_services %}
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-bold font-heading text-dark mb-4">Outros Serviços</h3>
+                    <ul class="space-y-3">
+                        {% for other in related_services %}
+                        <li>
+                            <a href="{{ url_for('service_detail', slug=other.slug) }}" class="flex items-center text-gray-700 hover:text-primary transition-colors">
+                                <i class="fas fa-arrow-right text-primary mr-2"></i>
+                                <span>{{ other.name }}</span>
                             </a>
                         </li>
                         {% endfor %}
                     </ul>
-                    <a href="{{ url_for('services_list') }}" class="mt-6 block w-full text-center bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                        Ver Todos os Serviços
-                    </a>
                 </div>
+                {% endif %}
                 
-                <div class="bg-orange-500 text-white p-6 rounded-lg shadow-lg mt-8 text-center">
-                    <h3 class="text-xl font-bold mb-2">Precisa de Ajuda?</h3>
-                    <p class="mb-4">Entre em contato para um orçamento sem compromisso.</p>
-                    <a href="#contato" class="bg-white text-orange-600 font-bold py-2 px-6 rounded-lg hover:bg-gray-200 transition-colors">
+                <!-- CTA na Sidebar -->
+                <div class="bg-primary-dark text-white p-8 rounded-lg shadow-lg text-center">
+                    <h3 class="text-2xl font-bold font-heading mb-3">Precisa de Ajuda?</h3>
+                    <p class="text-blue-200 mb-6">Entre em contato para um orçamento sem compromisso.</p>
+                    <a href="{{ url_for('index') }}#contact" class="bg-secondary hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-colors inline-block w-full text-lg shadow-md">
                         Fale Conosco
+                    </a>
+                     <a href="https://wa.me/5521964474147" target="_blank" class="mt-4 border-2 border-white text-white font-bold py-3 px-6 rounded-lg hover:bg-white hover:text-primary-dark transition-colors inline-block w-full text-lg shadow-md">
+                        Falar no WhatsApp
                     </a>
                 </div>
             </aside>
-        </div>
 
+        </div>
     </div>
 </div>
 {% endblock %} 
