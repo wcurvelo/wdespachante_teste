@@ -1,4 +1,0 @@
-crie um documento .md na pasta  docs com as mudanças que implementamos  nesse chat.@docs 
-
-analise meu projeto por completo e crie um documento .md na pasta docs completo sobre  o que ele é, o que usa, e tudo que for nscessario para minha equipe que vai utilizar 
-
